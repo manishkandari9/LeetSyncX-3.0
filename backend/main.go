@@ -5,12 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -18,184 +16,138 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// 🔹 Global Variables
+var githubClientID, githubClientSecret, redirectURI, githubUsername, githubRepo string
+
 // ✅ Load environment variables
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("❌ Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️ Warning: Could not load .env file")
 	}
+
+	githubClientID = getEnv("GITHUB_CLIENT_ID")
+	githubClientSecret = getEnv("GITHUB_CLIENT_SECRET")
+	redirectURI = getEnv("GITHUB_REDIRECT_URI")
+	githubUsername = getEnv("GITHUB_USERNAME")
+	githubRepo = getEnv("GITHUB_REPO")
 }
 
-// ✅ GitHub file structure
-type GitHubFile struct {
-	Message string `json:"message"`
-	Content string `json:"content"`
-	SHA     string `json:"sha,omitempty"`
+// 🔹 Helper function to get environment variables safely
+func getEnv(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("❌ Missing environment variable: %s", key)
+	}
+	return value
 }
 
-// ✅ Function to get SHA of existing file (if it exists)
-func getFileSHA(fileName string) (string, error) {
-	githubUsername := os.Getenv("GITHUB_USERNAME")
-	repoName := os.Getenv("GITHUB_REPO")
-	token := os.Getenv("GITHUB_TOKEN")
-
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s", githubUsername, repoName, fileName)
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Set("Authorization", "token "+token)
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 404 {
-		log.Println("⚠️ File not found. Proceeding with creation.")
-		return "", nil
-	}
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	var fileData struct {
-		SHA string `json:"sha"`
-	}
-	err = json.Unmarshal(body, &fileData)
-	if err != nil {
-		return "", err
-	}
-
-	return fileData.SHA, nil
+// ✅ Step 1: Get GitHub OAuth URL
+func getGitHubLoginURL() string {
+	return fmt.Sprintf("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=repo", githubClientID, redirectURI)
 }
 
-// ✅ Function to check if file content is same as existing GitHub file
-func isDuplicate(fileName string, newContent string) (bool, error) {
-	githubUsername := os.Getenv("GITHUB_USERNAME")
-	repoName := os.Getenv("GITHUB_REPO")
-	token := os.Getenv("GITHUB_TOKEN")
+// ✅ Step 2: Exchange GitHub Code for Access Token
+func getGitHubAccessToken(code string) (string, error) {
+	url := "https://github.com/login/oauth/access_token"
 
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s", githubUsername, repoName, fileName)
+	requestBody, _ := json.Marshal(map[string]string{
+		"client_id":     githubClientID,
+		"client_secret": githubClientSecret,
+		"code":          code,
+		"redirect_uri":  redirectURI,
+	})
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return false, err
+		return "", fmt.Errorf("request creation failed: %v", err)
 	}
 
-	req.Header.Set("Authorization", "token "+token)
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 404 {
-		return false, nil
-	}
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	var fileData struct {
-		Content string `json:"content"`
-	}
-	err = json.Unmarshal(body, &fileData)
-	if err != nil {
-		return false, err
-	}
-
-	decodedContent, err := base64.StdEncoding.DecodeString(strings.TrimSpace(fileData.Content))
-	if err != nil {
-		return false, err
-	}
-
-	return string(decodedContent) == newContent, nil
-}
-
-// ✅ Function to push/update file to GitHub
-func pushToGitHub(fileName string, content string) error {
-	githubUsername := os.Getenv("GITHUB_USERNAME")
-	repoName := os.Getenv("GITHUB_REPO")
-	token := os.Getenv("GITHUB_TOKEN")
-
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s", githubUsername, repoName, fileName)
-
-	encodedContent := encodeToBase64(content)
-
-	sha, err := getFileSHA(fileName)
-	if err != nil {
-		log.Println("❌ Error getting file SHA:", err)
-	}
-
-	isSame, err := isDuplicate(fileName, content)
-	if err != nil {
-		log.Println("❌ Error checking duplicate:", err)
-	}
-
-	if isSame {
-		log.Println("✅ File already exists with same content. No update needed.")
-		return nil
-	}
-
-	file := GitHubFile{
-		Message: "LeetCode solution added: " + fileName,
-		Content: encodedContent,
-		SHA:     sha,
-	}
-
-	jsonData, err := json.Marshal(file)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", "token "+token)
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", fmt.Errorf("failed to fetch access token: %v", err)
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode != 201 && resp.StatusCode != 200 {
-		return fmt.Errorf("GitHub Error: %s", string(body))
+	body, _ := io.ReadAll(resp.Body)
+
+	var response map[string]string
+	if err := json.Unmarshal(body, &response); err != nil {
+		return "", fmt.Errorf("failed to parse response: %v", err)
 	}
 
-	fmt.Println("✅ Successfully pushed to GitHub:", fileName)
+	accessToken, exists := response["access_token"]
+	if !exists {
+		return "", fmt.Errorf("❌ No access token found in response: %s", body)
+	}
+
+	return accessToken, nil
+}
+
+// ✅ Step 3: Check if File Exists & Push to GitHub
+func pushToGitHub(accessToken, fileName, content string) error {
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s", githubUsername, githubRepo, fileName)
+	encodedContent := base64.StdEncoding.EncodeToString([]byte(content))
+
+	// 🔹 Check if file already exists
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to check file existence: %v", err)
+	}
+	defer resp.Body.Close()
+
+	var sha string
+	if resp.StatusCode == 200 {
+		var fileData map[string]interface{}
+		body, _ := io.ReadAll(resp.Body)
+		json.Unmarshal(body, &fileData)
+		sha, _ = fileData["sha"].(string)
+	}
+
+	// 🔹 Prepare request to create/update file
+	fileData := map[string]string{
+		"message": "📌 Auto-update: " + fileName,
+		"content": encodedContent,
+	}
+
+	if sha != "" {
+		fileData["sha"] = sha
+	}
+
+	jsonData, _ := json.Marshal(fileData)
+
+	req, err = http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return fmt.Errorf("GitHub API request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 201 && resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("❌ GitHub API error: %s", string(body))
+	}
+
+	log.Println("✅ Successfully pushed to GitHub:", fileName)
 	return nil
 }
 
-// ✅ Function to extract LeetCode problem name
-func extractLeetCodeProblem(content string) string {
-	re := regexp.MustCompile(`(?i)(leetcode.*?\d+)`)
-	matches := re.FindStringSubmatch(content)
-	if len(matches) > 0 {
-		return matches[0]
-	}
-	return "Unknown_Problem"
-}
-
-// ✅ Function to encode content to Base64
-func encodeToBase64(data string) string {
-	return base64.StdEncoding.EncodeToString([]byte(data))
-}
-
-// ✅ API Endpoint for Chrome Extension
+// ✅ Step 4: API Endpoints
 func main() {
 	r := gin.Default()
 
@@ -207,29 +159,50 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	r.POST("/save", func(c *gin.Context) {
-		var requestBody struct {
-			Filename string `json:"filename"`
-			Content  string `json:"content"`
-		}
+	// 👉 Step 1: Redirect to GitHub Login
+	r.GET("/login", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"url": getGitHubLoginURL()})
+	})
 
-		if err := c.BindJSON(&requestBody); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	// 👉 Step 2: Handle GitHub OAuth Callback
+	r.GET("/auth/github/callback", func(c *gin.Context) {
+		code := c.Query("code")
+		if code == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing authorization code"})
 			return
 		}
 
-		// ✅ अब फ़ाइल का नाम जैसा है वैसा ही रहेगा (एक्सटेंशन हटेगा नहीं)
-		finalFilename := requestBody.Filename
-
-		err := pushToGitHub(finalFilename, requestBody.Content)
+		accessToken, err := getGitHubAccessToken(code)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Solution saved to GitHub", "filename": finalFilename})
+		c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 	})
 
-	fmt.Println("🚀 Server started on port 8080...")
+	// 👉 Step 3: Save File to GitHub
+	r.POST("/save", func(c *gin.Context) {
+		var requestBody struct {
+			AccessToken string `json:"access_token"`
+			Filename    string `json:"filename"`
+			Content     string `json:"content"`
+		}
+
+		if err := c.BindJSON(&requestBody); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Invalid request"})
+			return
+		}
+
+		err := pushToGitHub(requestBody.AccessToken, requestBody.Filename, requestBody.Content)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "✅ Solution saved to GitHub", "filename": requestBody.Filename})
+	})
+
+	fmt.Println("🚀 OAuth Server started on port 8080...")
 	r.Run(":8080")
 }

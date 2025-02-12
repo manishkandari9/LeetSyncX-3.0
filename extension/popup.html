@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeetCode to GitHub</title>
+    <link rel="stylesheet" href="style.css"> <!-- ✅ Styling -->
 </head>
 <body>
     <h2>LeetCode to GitHub</h2>
-    <button id="saveSolution">Save Solution</button>  <!-- ✅ Correct ID -->
-    <input type="text" id="repo" placeholder="GitHub Repo (user/repo)">
+
+    <button id="loginGithub">🔑 Login with GitHub</button>
+    <button id="saveSolution">💾 Save Solution</button>  <!-- ✅ Correct ID -->
+
+    <p id="status">🔄 Waiting for action...</p>  <!-- ✅ Default status -->
+
     <script src="axios.min.js"></script>
     <script src="popup.js"></script>
+    <script src="script.js"></script>
+
+  
 </body>
 </html>
