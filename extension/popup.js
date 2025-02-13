@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let loginButton = document.getElementById("loginGithub");
     let saveButton = document.getElementById("saveSolution");
+    let setupHookButton = document.getElementById("setupHook"); // ✅ Setup Hook Button
     let statusText = document.getElementById("status");
 
     console.log("🔄 DOM Fully Loaded, Initializing Script...");
@@ -20,27 +21,25 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 👉 2️⃣ Check if GitHub Token is Saved
-    if (chrome.storage && chrome.storage.sync) {
-        console.log("🔄 chrome.storage.sync is available.");
-        chrome.storage.sync.get(["githubAccessToken"], function (result) {
-            if (result.githubAccessToken) {
-                console.log("✅ GitHub Token Found! Hiding login button...");
-                loginButton.style.display = "none"; 
-                statusText.innerText = "✅ Logged in to GitHub";
-            } else {
-                console.warn("❌ GitHub Token NOT Found! Please log in.");
-                statusText.innerText = "❌ Not Logged In! Please login first.";
-            }
-        });
-    } 
+    // 👉 2️⃣ Check if GitHub Token is Saved Securely
+    chrome.storage.sync.get(["githubAccessToken"], function (result) {
+        if (result.githubAccessToken) {
+            console.log("✅ GitHub Token Found! Auto-Logging In...");
+            if (loginButton) loginButton.style.display = "none"; 
+            if (setupHookButton) setupHookButton.style.display = "block"; // ✅ Show Setup Hook
+            statusText.innerText = "✅ Logged in to GitHub";
+        } else {
+            console.warn("❌ GitHub Token NOT Found! Please log in.");
+            statusText.innerText = "❌ Not Logged In! Please login first.";
+        }
+    });
+
     // 👉 3️⃣ Save Solution Button Click
     if (saveButton) {
         saveButton.addEventListener("click", function () {
             console.log("🚀 Save Solution Button Clicked!");
             statusText.innerText = "🔄 Fetching solution from LeetCode...";
 
-            // ✅ Get Active Tab
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 if (!tabs || tabs.length === 0) {
                     console.error("❌ No Active Tab Found!");
@@ -50,8 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 console.log("📌 Active Tab Found:", tabs[0]);
 
-                // ✅ Send message to content script
-                console.log("📩 Sending Message to Content Script...");
                 chrome.tabs.sendMessage(tabs[0].id, { action: "save_solution" }, function (response) {
                     if (chrome.runtime.lastError) {
                         console.error("❌ Chrome Runtime Error:", chrome.runtime.lastError.message);
@@ -80,32 +77,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     console.log("📄 Extracted Code:", codeContent);
 
-                    // ✅ Only allow Java & C++
-                    if (language === "txt") {
-                        let isCpp = /^\s*#include\b/m.test(codeContent) || 
-                                    codeContent.includes("std::") || 
-                                    /vector\s*<\s*int\s*>/.test(codeContent);
-
-                        let isJava = /public\s+static\s+void\s+main/.test(codeContent) || 
-                                     /System\.out\.println/.test(codeContent) || 
-                                     /public\s+class\s+\w+\s*{/.test(codeContent);
-
-                        if (isCpp && !isJava) {
-                            language = "cpp";
-                        } else if (isJava && !isCpp) {
-                            language = "java";
-                        } else {
-                            alert("❌ Error: Only Java & C++ solutions are allowed!");
-                            return;
-                        }
-                    }
-
-                    console.log("📌 Detected Language:", language);
-
-                    const extensionMap = { "cpp": "cpp", "java": "java" };
+                    const extensionMap = { "cpp": "cpp", "java": "java", "py": "py", "js": "js" };
 
                     if (!extensionMap[language]) {
-                        alert("❌ Error: Only Java & C++ solutions are allowed!");
+                        alert("❌ Error: Only Java, C++, Python & JavaScript solutions are allowed!");
                         return;
                     }
 
@@ -114,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     console.log("📂 File to Save:", fileName);
 
-                    // ✅ Get GitHub Token & Upload Solution
+                    // ✅ Securely Retrieve GitHub Token
                     chrome.storage.sync.get(["githubAccessToken"], function (result) {
                         if (!result.githubAccessToken) {
                             alert("❌ Error: GitHub Authentication Required! Please log in.");
@@ -131,20 +106,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// ✅ Secure Function to Store Token in Chrome Storage
+function storeGithubToken(accessToken) {
+    chrome.storage.sync.set({ githubAccessToken: accessToken }, function () {
+        if (chrome.runtime.lastError) {
+            console.error("❌ Error storing token:", chrome.runtime.lastError);
+        } else {
+            console.log("✅ GitHub Access Token securely stored in Chrome Storage!");
+        }
+    });
+}
+
 // ✅ Function to send solution to GitHub
 function sendToGithub(fileName, code, accessToken) {
     console.log("📤 Sending Code to GitHub:", fileName);
-
     let githubRepo = "manishkandari09/Leetcode-Solutions"; // ✅ Replace with your repo
-
-    console.log("📦 Target Repository:", githubRepo);
-
     const githubApiUrl = `https://api.github.com/repos/${githubRepo}/contents/${fileName}`;
 
     console.log("🌐 Checking if File Already Exists on GitHub...");
 
     axios.get(githubApiUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` } // ✅ FIXED: Use Bearer token
+        headers: { Authorization: `Bearer ${accessToken}` }
     }).then(response => {
         let sha = response.data.sha;
         console.log("📝 File Found on GitHub. Updating...");
@@ -154,7 +136,7 @@ function sendToGithub(fileName, code, accessToken) {
             content: btoa(unescape(encodeURIComponent(code))),
             sha
         }, {
-            headers: { Authorization: `Bearer ${accessToken}` } // ✅ FIXED: Use Bearer token
+            headers: { Authorization: `Bearer ${accessToken}` }
         })
         .then(() => {
             console.log("✅ Solution Updated Successfully!");
@@ -165,22 +147,35 @@ function sendToGithub(fileName, code, accessToken) {
             alert("❌ Error Updating File: " + err.message);
         });
 
-    }).catch(() => {
-        console.log("🆕 File Not Found. Creating New File...");
+    }).catch(error => {
+        if (error.response && error.response.status === 404) {
+            console.log("🆕 File Not Found. Creating New File...");
 
-        axios.put(githubApiUrl, {
-            message: `Added ${fileName}`,
-            content: btoa(unescape(encodeURIComponent(code)))
-        }, {
-            headers: { Authorization: `Bearer ${accessToken}` } // ✅ FIXED: Use Bearer token
-        })
-        .then(() => {
-            console.log("✅ Solution Saved Successfully!");
-            alert("✅ Solution Saved on GitHub!");
-        })
-        .catch(err => {
-            console.error("❌ Error Saving File:", err.message);
-            alert("❌ Error Saving File: " + err.message);
-        });
+            axios.put(githubApiUrl, {
+                message: `Added ${fileName}`,
+                content: btoa(unescape(encodeURIComponent(code)))
+            }, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+            .then(() => {
+                console.log("✅ Solution Saved Successfully!");
+                alert("✅ Solution Saved on GitHub!");
+            })
+            .catch(err => {
+                console.error("❌ Error Saving File:", err.message);
+                alert("❌ Error Saving File: " + err.message);
+            });
+
+        } else if (error.response && error.response.status === 401) {
+            console.warn("⚠️ Token Expired! Logging out user...");
+            chrome.storage.sync.remove("githubAccessToken", function () {
+                alert("⚠️ Session Expired! Please log in again.");
+                location.reload();
+            });
+
+        } else {
+            console.error("❌ Unknown Error:", error.message);
+            alert("❌ Error: " + error.message);
+        }
     });
 }

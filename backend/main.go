@@ -171,15 +171,20 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing authorization code"})
 			return
 		}
-
+	
 		accessToken, err := getGitHubAccessToken(code)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
+	
+		// 🔹 Token को Secure HttpOnly Cookie में Store करें (Frontend को दिखाने की ज़रूरत नहीं)
+		c.SetCookie("githubAccessToken", accessToken, 3600, "/", "localhost", false, true)
+	
+		// ✅ Frontend को सिर्फ Success Message भेजें
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Authentication successful!"})
 	})
+	
 
 	// 👉 Step 3: Save File to GitHub
 	r.POST("/save", func(c *gin.Context) {
