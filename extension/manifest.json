@@ -4,7 +4,7 @@
     "version": "1.1",
     "description": "Automatically push LeetCode solutions to GitHub",
     "permissions": [
-        "storage", "activeTab", "scripting", "identity" ,  "cookies",  "https://github.com/*"],
+        "storage", "activeTab", "scripting", "identity" ,  "cookies"],
     "host_permissions": [
         "https://leetcode.com/*",
         "https://api.github.com/*",
