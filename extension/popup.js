@@ -12,27 +12,35 @@ document.addEventListener("DOMContentLoaded", function () {
     // 👉 1️⃣ GitHub Login Process
     if (loginButton) {
         loginButton.addEventListener("click", function () {
-            console.log("🔗 github pr  Redirect...");
-            statusText.innerText = " Redirecting to GitHub...";
-            window.open(
-                `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`,
-                "_blank"
-            );
+            console.log("🔗 Redirecting to GitHub...");
+            statusText.innerText = "Redirecting to GitHub...";
+            
+            // ✅ Directly redirect to GitHub OAuth login page
+            window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
         });
+        
     }
 
     // 👉 2️⃣ Check if GitHub Token is Saved Securely
-    chrome.storage.sync.get(["githubAccessToken"], function (result) {
-        if (result.githubAccessToken) {
-            console.log(" GitHub Token Found! Auto-Logging In...");
-            if (loginButton) loginButton.style.display = "none"; 
-            if (setupHookButton) setupHookButton.style.display = "block"; // ✅ Show Setup Hook
-            statusText.innerText = " Logged in to GitHub";
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure 'chrome.storage.sync' is available
+        if (chrome && chrome.storage && chrome.storage.sync) {
+            chrome.storage.sync.get(["githubAccessToken"], function(result) {
+                if (result.githubAccessToken) {
+                    console.log("GitHub Token Found! Auto-Logging In...");
+                    if (loginButton) loginButton.style.display = "none"; 
+                    if (setupHookButton) setupHookButton.style.display = "block"; // ✅ Show Setup Hook
+                    statusText.innerText = "Logged in to GitHub";
+                } else {
+                    console.warn("GitHub Token NOT Found! Please log in.");
+                    statusText.innerText = "Not Logged In! Please login first.";
+                }
+            });
         } else {
-            console.warn(" GitHub Token NOT Found! Please log in.");
-            statusText.innerText = " Not Logged In! Please login first.";
+            console.error("'chrome.storage.sync' is undefined");
         }
     });
+    
 
     //  3️ Save Solution Button Click
     if (saveButton) {
@@ -117,7 +125,7 @@ function storeGithubToken(accessToken) {
     });
 }
 
-// ✅ Function to send solution to GitHub
+//  Function to send solution to GitHub
 function sendToGithub(fileName, code, accessToken) {
     console.log(" Sending Code to GitHub:", fileName);
     let githubRepo = "manishkandari09/Leetcode-Solutions"; // ✅ Replace with your repo
@@ -158,7 +166,7 @@ function sendToGithub(fileName, code, accessToken) {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
             .then(() => {
-                console.log("✅ Solution Saved Successfully!");
+                console.log(" Solution Saved Successfully!");
                 alert(" Solution Saved ho gya   GitHub me !");
             })
             .catch(err => {
@@ -167,15 +175,15 @@ function sendToGithub(fileName, code, accessToken) {
             });
 
         } else if (error.response && error.response.status === 401) {
-            console.warn("⚠️ Token Expired! Logging out user...");
+            console.warn(" Token Expired! Logging out user...");
             chrome.storage.sync.remove("githubAccessToken", function () {
                 alert(" Session Expired ho gya h ! Please log in karo phirr se.");
                 location.reload();
             });
 
         } else {
-            console.error("❌ Unknown Error:", error.message);
-            alert("❌ Error: " + error.message);
+            console.error(" Unknown Error:", error.message);
+            alert(" Error: " + error.message);
         }
     });
 }

@@ -193,7 +193,7 @@ func main() {
 		}
 
 		if err := c.BindJSON(&requestBody); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Invalid request"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": " Invalid request"})
 			return
 		}
 
