@@ -1,7 +1,6 @@
 // ✅ Background script initialized
-console.log("🔄 Background Script Loaded...");
+console.log("🔄 Background Script Load ho rhi h ...");
 
-// 👉 1️⃣ Add Right Click Context Menu
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "saveSolution",
@@ -10,18 +9,17 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-// 👉 2️⃣ Handle Context Menu Click
+//  2️ Handle Context Menu Click ko
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "saveSolution") {
-        console.log("📌 Context Menu Clicked: Save Solution");
+        console.log(" Context Menu KO Click kiya  Save Solution");
         chrome.tabs.sendMessage(tab.id, { action: "save_solution" });
     }
 });
 
-// 👉 3️⃣ Listen for Messages from Content Script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "log_message") {
-        console.log("📩 Log from Content Script:", request.message);
+        console.log("  Content Script ka log:", request.message);
     }
 
     if (request.action === "get_active_tab") {
