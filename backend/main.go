@@ -19,7 +19,7 @@ import (
 // 🔹 Global Variables
 var githubClientID, githubClientSecret, redirectURI, githubUsername, githubRepo string
 
-//  Load environment variables
+// 🔹 Load environment variables
 func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️ Warning: Could not load .env file")
@@ -36,17 +36,17 @@ func init() {
 func getEnv(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		log.Fatalf(" Missing environment variable: %s", key)
+		log.Fatalf("❌ Missing environment variable: %s", key)
 	}
 	return value
 }
 
-//  Step 1: Get GitHub OAuth URL
+// 🔹 Step 1: Get GitHub OAuth URL
 func getGitHubLoginURL() string {
 	return fmt.Sprintf("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=repo", githubClientID, redirectURI)
 }
 
-//  Step 2: Exchange GitHub Code for Access Token
+// 🔹 Step 2: Exchange GitHub Code for Access Token
 func getGitHubAccessToken(code string) (string, error) {
 	url := "https://github.com/login/oauth/access_token"
 
@@ -59,7 +59,7 @@ func getGitHubAccessToken(code string) (string, error) {
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return "", fmt.Errorf("request creation failed: %v", err)
+		return "", fmt.Errorf("❌ Request creation failed: %v", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -68,26 +68,27 @@ func getGitHubAccessToken(code string) (string, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to fetch access token: %v", err)
+		return "", fmt.Errorf("❌ Failed to fetch access token: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
+	fmt.Println("📜 GitHub API Response:", string(body)) // ✅ Debugging ke liye
 
 	var response map[string]string
 	if err := json.Unmarshal(body, &response); err != nil {
-		return "", fmt.Errorf("failed to parse response: %v", err)
+		return "", fmt.Errorf("❌ Failed to parse response: %v", err)
 	}
 
 	accessToken, exists := response["access_token"]
 	if !exists {
-		return "", fmt.Errorf(" No access token found in response: %s", body)
+		return "", fmt.Errorf("❌ No access token found in response: %s", body)
 	}
 
 	return accessToken, nil
 }
 
-//  Step 3: Check if File Exists & Push to GitHub
+// 🔹 Step 3: Check if File Exists & Push to GitHub
 func pushToGitHub(accessToken, fileName, content string) error {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents/%s", githubUsername, githubRepo, fileName)
 	encodedContent := base64.StdEncoding.EncodeToString([]byte(content))
@@ -99,7 +100,7 @@ func pushToGitHub(accessToken, fileName, content string) error {
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to check file existence: %v", err)
+		return fmt.Errorf("❌ Failed to check file existence: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -111,9 +112,9 @@ func pushToGitHub(accessToken, fileName, content string) error {
 		sha, _ = fileData["sha"].(string)
 	}
 
-	//  Prepare request to create/update file
+	// 🔹 Prepare request to create/update file
 	fileData := map[string]string{
-		"message": " Auto-update: " + fileName,
+		"message": "🚀 Auto-update: " + fileName,
 		"content": encodedContent,
 	}
 
@@ -125,7 +126,7 @@ func pushToGitHub(accessToken, fileName, content string) error {
 
 	req, err = http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("failed to create request: %v", err)
+		return fmt.Errorf("❌ Failed to create request: %v", err)
 	}
 
 	req.Header.Set("Authorization", "Bearer "+accessToken)
@@ -134,57 +135,59 @@ func pushToGitHub(accessToken, fileName, content string) error {
 
 	resp, err = client.Do(req)
 	if err != nil {
-		return fmt.Errorf("GitHub API request failed: %v", err)
+		return fmt.Errorf("❌ GitHub API request failed: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 && resp.StatusCode != 200 {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf(" GitHub API error: %s", string(body))
+		return fmt.Errorf("❌ GitHub API error: %s", string(body))
 	}
 
-	log.Println(" Successfully pushed to GitHub:", fileName)
+	log.Println("✅ Successfully pushed to GitHub:", fileName)
 	return nil
 }
 
-//  Step 4: API Endpoints
+// 🔹 Step 4: API Endpoints
 func main() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowOrigins:     []string{"http://127.0.0.1:5500/extension/popup.html", "chrome-extension://*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
 
-	//  Step 1: Redirect to GitHub Login
+	// 🔹 Step 1: Redirect to GitHub Login
 	r.GET("/login", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"url": getGitHubLoginURL()})
 	})
 
-	//  Step 2: Handle GitHub OAuth Callback
+	// 🔹 Step 2: Handle GitHub OAuth Callback
 	r.GET("/auth/github/callback", func(c *gin.Context) {
 		code := c.Query("code")
 		if code == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": " Missing authorization code"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing authorization code"})
 			return
 		}
-	
+
 		accessToken, err := getGitHubAccessToken(code)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-	
-		c.SetCookie("githubAccessToken", accessToken, 3600, "/", "localhost", false, true)
-	
-		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Authentication successful!"})
-	})
-	
 
-	//  Step 3: Save file to GitHub
+		// ✅ Token frontend ko bhejo
+		c.JSON(http.StatusOK, gin.H{
+			"success":      true,
+			"message":      "✅ Authentication successful!",
+			"access_token": accessToken, // ✅ Fix
+		})
+	})
+
+	// 🔹 Step 3: Save file to GitHub
 	r.POST("/save", func(c *gin.Context) {
 		var requestBody struct {
 			AccessToken string `json:"access_token"`
@@ -193,7 +196,7 @@ func main() {
 		}
 
 		if err := c.BindJSON(&requestBody); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": " Invalid request"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Invalid request"})
 			return
 		}
 
@@ -203,7 +206,7 @@ func main() {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": " Solution saved to GitHub", "filename": requestBody.Filename})
+		c.JSON(http.StatusOK, gin.H{"message": "✅ Solution saved to GitHub", "filename": requestBody.Filename})
 	})
 
 	fmt.Println("🚀 OAuth Server started on port 8080...")
