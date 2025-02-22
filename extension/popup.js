@@ -1,189 +1,210 @@
-document.addEventListener("DOMContentLoaded", function () {
-    let loginButton = document.getElementById("loginGithub");
-    let saveButton = document.getElementById("saveSolution");
-    let setupHookButton = document.getElementById("setupHook"); // ✅ Setup Hook Button
-    let statusText = document.getElementById("status");
+document.addEventListener("DOMContentLoaded", async () => {
+    const loginButton = document.getElementById("loginGithub");
+    const saveButton = document.getElementById("saveSolution");
+    const setupHookButton = document.getElementById("setupHook");
+    const statusText = document.getElementById("status");
+    const uriValue = document.getElementById("uriValue");
 
-    console.log(" DOM Fully Loaded, Initializing Script...");
+    console.log("✅ DOM Fully Loaded, Initializing Script...");
+    uriValue.textContent = chrome.identity.getRedirectURL();
 
-    const GITHUB_CLIENT_ID = "Ov23lifxi8XMbqm0Zdsa"; // ✅ Replace with your actual client ID
-    const REDIRECT_URI = "http://localhost:8080/auth/github/callback"; // ✅ Replace with your backend URL
+    const GITHUB_CLIENT_ID = "Ov23lifxi8XMbqm0Zdsa";
+    const REDIRECT_URI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org";
+    const BACKEND_URL = "http://localhost:8080";
 
-    // 👉 1️⃣ GitHub Login Process
-    if (loginButton) {
-        loginButton.addEventListener("click", function () {
-            console.log("🔗 Redirecting to GitHub...");
-            statusText.innerText = "Redirecting to GitHub...";
-            
-            // ✅ Directly redirect to GitHub OAuth login page
-            window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
-        });
-        
+    // Check if GitHub Token and Selected Repo are Saved
+    const result = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
+    if (result.githubAccessToken) {
+        console.log("✅ GitHub Token Found! Auto-Logging In...");
+        loginButton.style.display = "none";
+        if (result.selectedRepo) {
+            setupHookButton.style.display = "none";
+            saveButton.style.display = "block";
+            statusText.innerText = `Logged in, selected repo: ${result.selectedRepo}`;
+        } else {
+            setupHookButton.style.display = "block";
+            statusText.innerText = "Logged in, please setup hook";
+        }
+    } else {
+        console.warn("❌ GitHub Token NOT Found! Please log in.");
+        statusText.innerText = "Not Logged In! Please login first.";
     }
 
-    // 👉 2️⃣ Check if GitHub Token is Saved Securely
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ensure 'chrome.storage.sync' is available
-        if (chrome && chrome.storage && chrome.storage.sync) {
-            chrome.storage.sync.get(["githubAccessToken"], function(result) {
-                if (result.githubAccessToken) {
-                    console.log("GitHub Token Found! Auto-Logging In...");
-                    if (loginButton) loginButton.style.display = "none"; 
-                    if (setupHookButton) setupHookButton.style.display = "block"; // ✅ Show Setup Hook
-                    statusText.innerText = "Logged in to GitHub";
-                } else {
-                    console.warn("GitHub Token NOT Found! Please log in.");
-                    statusText.innerText = "Not Logged In! Please login first.";
+    // GitHub Login Process
+    loginButton?.addEventListener("click", () => {
+        console.log("🔗 Initiating GitHub OAuth...");
+        statusText.innerText = "Redirecting to GitHub...";
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=repo&response_type=code`;
+
+        chrome.identity.launchWebAuthFlow({
+            url: authUrl,
+            interactive: true
+        }, async (redirectUrl) => {
+            if (chrome.runtime.lastError) {
+                console.error("❌ OAuth Error:", chrome.runtime.lastError);
+                statusText.innerText = "OAuth Error!";
+                return;
+            }
+            const url = new URL(redirectUrl);
+            const code = url.searchParams.get("code");
+            if (code) {
+                try {
+                    const response = await axios.get(`${BACKEND_URL}/emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org`, { params: { code } });
+                    const data = response.data;
+                    if (data.success && data.access_token) {
+                        chrome.storage.sync.set({ githubAccessToken: data.access_token }, () => {
+                            console.log("✅ GitHub Access Token Stored!");
+                            loginButton.style.display = "none";
+                            setupHookButton.style.display = "block";
+                            statusText.innerText = "Logged in to GitHub";
+                        });
+                    }
+                } catch (error) {
+                    console.error("❌ Error fetching token:", error);
+                    statusText.innerText = "Login Failed!";
+                }
+            }
+        });
+    });
+
+    // Setup Hook Button Click
+    setupHookButton?.addEventListener("click", async () => {
+        const token = await chrome.storage.sync.get("githubAccessToken");
+        if (!token.githubAccessToken) {
+            alert("Please log in first.");
+            return;
+        }
+        statusText.innerText = "Fetching repositories...";
+        try {
+            const response = await axios.get("https://api.github.com/user/repos", {
+                headers: {
+                    Authorization: `Bearer ${token.githubAccessToken}`,
+                    Accept: "application/vnd.github.v3+json"
                 }
             });
-        } else {
-            console.error("'chrome.storage.sync' is undefined");
+            const repos = response.data;
+            console.log("✅ Repositories Fetched:", repos.length);
+
+            const select = document.createElement("select");
+            select.id = "repoSelect";
+            repos.forEach(repo => {
+                const option = document.createElement("option");
+                option.value = repo.full_name;
+                option.text = repo.full_name;
+                select.appendChild(option);
+            });
+
+            const confirmButton = document.createElement("button");
+            confirmButton.textContent = "Select Repository";
+            confirmButton.addEventListener("click", () => {
+                const selectedRepo = select.value;
+                if (selectedRepo) {
+                    chrome.storage.sync.set({ selectedRepo }, () => {
+                        console.log("✅ Repository Selected:", selectedRepo);
+                        alert("Repository selected: " + selectedRepo);
+                        setupHookButton.style.display = "none";
+                        saveButton.style.display = "block";
+                        statusText.innerText = `Selected repo: ${selectedRepo}`;
+                        document.body.removeChild(select);
+                        document.body.removeChild(confirmButton);
+                    });
+                }
+            });
+
+            document.body.appendChild(select);
+            document.body.appendChild(confirmButton);
+            statusText.innerText = "Please select a repository.";
+        } catch (error) {
+            console.error("❌ Error fetching repositories:", error);
+            alert("Failed to fetch repositories.");
+            statusText.innerText = "Error fetching repositories.";
         }
     });
-    
 
-    //  3️ Save Solution Button Click
-    if (saveButton) {
-        saveButton.addEventListener("click", function () {
-            console.log(" Save Solution Button Clicked!");
-            statusText.innerText = " Fetching solution from LeetCode...";
+    // Save Solution Button Click
+   saveButton?.addEventListener("click", async () => {
+    console.log("✅ Save Solution Button Clicked!");
+    statusText.innerText = "Fetching solution from LeetCode...";
 
-            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                if (!tabs || tabs.length === 0) {
-                    console.error(" No Active Tab Found!");
-                    alert(" Error: No active tab found!");
-                    return;
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    console.log("Active tab:", tab.url);
+    if (!tab || !tab.url.includes("leetcode.com/problems")) {
+        console.error("❌ Not on a LeetCode problem page!");
+        alert("Error: Please open a LeetCode problem page!");
+        return;
+    }
+
+    try {
+        const response = await new Promise((resolve) => {
+            chrome.tabs.sendMessage(tab.id, { action: "save_solution" }, (resp) => {
+                if (chrome.runtime.lastError) {
+                    console.error("❌ Chrome Runtime Error:", chrome.runtime.lastError.message);
+                    resolve({ status: "error", message: chrome.runtime.lastError.message });
+                } else {
+                    console.log("✅ Response from content script:", resp);
+                    resolve(resp);
                 }
-
-                console.log(" Active Tab Found:", tabs[0]);
-
-                chrome.tabs.sendMessage(tabs[0].id, { action: "save_solution" }, function (response) {
-                    if (chrome.runtime.lastError) {
-                        console.error(" Chrome Runtime Error:", chrome.runtime.lastError.message);
-                        alert(" Error: Unable to communicate with content script.");
-                        return;
-                    }
-
-                    if (!response || response.status !== "success") {
-                        console.error(" Error:", response?.message || "Solution not found!");
-                        alert(" Error: " + (response?.message || "Solution not found!"));
-                        return;
-                    }
-
-                    console.log(" Solution Extracted Successfully:", response);
-                    statusText.innerText = " Solution extracted! Uploading to GitHub...";
-
-                    let problemTitle = response.title ? response.title.replace(/[^a-zA-Z0-9_]/g, "_") : "Unknown_Problem";
-                    let problemNumber = response.number ? response.number : "000";
-                    let codeContent = response.code?.trim();
-                    let language = response.language?.toLowerCase().trim() || "";
-
-                    if (!codeContent) {
-                        alert(" Error: No code content found!");
-                        return;
-                    }
-
-                    console.log(" Extracted Code:", codeContent);
-
-                    const extensionMap = { "cpp": "cpp", "java": "java", "py": "py", "js": "js" };
-
-                    if (!extensionMap[language]) {
-                        alert(" Error: Only Java, C++, Python & JavaScript solutions are allowed!");
-                        return;
-                    }
-
-                    let fileExtension = extensionMap[language];
-                    let fileName = `${problemNumber}_${problemTitle}.${fileExtension}`;
-
-                    console.log(" File to Save:", fileName);
-
-                    //  Securely Retrieve GitHub Token
-                    chrome.storage.sync.get(["githubAccessToken"], function (result) {
-                        if (!result.githubAccessToken) {
-                            alert(" Error: GitHub Authentication Required! Please log in.");
-                            return;
-                        }
-
-                        console.log(" GitHub Token mil gya h  Uploading to GitHub...");
-                        statusText.innerText = " Uploading solution to GitHub...";
-                        sendToGithub(fileName, codeContent, result.githubAccessToken);
-                    });
-                });
             });
         });
+
+        if (response.status !== "success") {
+            console.error("❌ Failed to extract solution:", response.message);
+            alert("Error: " + (response.message || "Failed to extract solution!"));
+            return;
+        }
+
+        console.log("✅ Solution Extracted Successfully:", response);
+        statusText.innerText = "Solution extracted! Uploading to GitHub...";
+
+        const { title, number, code, language } = response;
+        const problemTitle = title.replace(/[^a-zA-Z0-9_]/g, "_") || "Unknown_Problem";
+        const problemNumber = number || "000";
+        const codeContent = code?.trim();
+
+        if (!codeContent) {
+            alert("Error: No code content found!");
+            return;
+        }
+
+        // Map language to file extension (must match backend expectations)
+        const extensionMap = {
+            "cpp": "cpp",
+            "java": "java",
+            "py": "py",
+            "js": "js"
+        };
+        const fileExtension = extensionMap[language];
+        if (!fileExtension) {
+            console.error("❌ Unsupported language:", language);
+            alert("Error: Unsupported language detected!");
+            return;
+        }
+
+        const fileName = `${problemNumber}_${problemTitle}.${fileExtension}`;
+
+        const { githubAccessToken, selectedRepo } = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
+        if (!githubAccessToken || !selectedRepo) {
+            alert("Error: Authentication or repository selection required!");
+            return;
+        }
+
+        console.log("✅ Uploading to GitHub via Backend...");
+        const saveResponse = await axios.post(`${BACKEND_URL}/save`, {
+            access_token: githubAccessToken,
+            filename: fileName,
+            content: codeContent,
+            repo: selectedRepo
+        });
+        const saveData = saveResponse.data;
+        if (saveData.message) {
+            console.log("✅ Solution Saved:", saveData.message);
+            statusText.innerText = "Solution Saved on GitHub!";
+            alert("Solution Saved on GitHub!");
+        }
+    } catch (error) {
+        console.error("❌ Error uploading to GitHub:", error);
+        statusText.innerText = "Error uploading solution.";
+        alert("Error: " + (error.response?.data.error || error.message));
     }
 });
-
-// ✅ Secure Function to Store Token in Chrome Storage
-function storeGithubToken(accessToken) {
-    chrome.storage.sync.set({ githubAccessToken: accessToken }, function () {
-        if (chrome.runtime.lastError) {
-            console.error(" Error storing token:", chrome.runtime.lastError);
-        } else {
-            console.log(" GitHub Access Token securely stored in Chrome Storage!");
-        }
-    });
-}
-
-//  Function to send solution to GitHub
-function sendToGithub(fileName, code, accessToken) {
-    console.log(" Sending Code to GitHub:", fileName);
-    let githubRepo = "manishkandari09/Leetcode-Solutions"; // ✅ Replace with your repo
-    const githubApiUrl = `https://api.github.com/repos/${githubRepo}/contents/${fileName}`;
-
-    console.log(" Checking if File Already Exists on GitHub...");
-
-    axios.get(githubApiUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-    }).then(response => {
-        let sha = response.data.sha;
-        console.log(" File mil gyi h GitHub. Updating...");
-
-        axios.put(githubApiUrl, {
-            message: `Updated ${fileName}`,
-            content: btoa(unescape(encodeURIComponent(code))),
-            sha
-        }, {
-            headers: { Authorization: `Bearer ${accessToken}` }
-        })
-        .then(() => {
-            console.log(" Solution Updated Successfully!");
-            alert(" Solution Updated on GitHub!");
-        })
-        .catch(err => {
-            console.error(" Error Updating File:", err.message);
-            alert(" Error Updating File: " + err.message);
-        });
-
-    }).catch(error => {
-        if (error.response && error.response.status === 404) {
-            console.log(" File Nahi mili. Creating New File...");
-
-            axios.put(githubApiUrl, {
-                message: `Added ${fileName}`,
-                content: btoa(unescape(encodeURIComponent(code)))
-            }, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            })
-            .then(() => {
-                console.log(" Solution Saved Successfully!");
-                alert(" Solution Saved ho gya   GitHub me !");
-            })
-            .catch(err => {
-                console.error(" Error Saving File:", err.message);
-                alert(" Error Saving File: " + err.message);
-            });
-
-        } else if (error.response && error.response.status === 401) {
-            console.warn(" Token Expired! Logging out user...");
-            chrome.storage.sync.remove("githubAccessToken", function () {
-                alert(" Session Expired ho gya h ! Please log in karo phirr se.");
-                location.reload();
-            });
-
-        } else {
-            console.error(" Unknown Error:", error.message);
-            alert(" Error: " + error.message);
-        }
-    });
-}
+});

@@ -1,40 +1,332 @@
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #4b5563;
+  --background-color: #1f2937;
+  --text-color: #f3f4f6;
+  --border-color: #374151;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
+  font-family: "Roboto", sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
   padding: 20px;
-  background-color: #f4f4f4;
+  min-width: 300px;
 }
 
-h2 {
-  color: #333;
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 20px;
-  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #374151;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.info {
+  background-color: #374151;
   border-radius: 5px;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-input {
   padding: 10px;
-  margin: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  width: 80%;
-  max-width: 300px;
+  margin-top: 20px;
+  font-size: 12px;
 }
 
-#status {
-  margin-top: 15px;
-  font-weight: bold;
+.uri-value {
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.spin {
+  animation: spin 2s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 400px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+  }
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Semi-transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it appears above other content */
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1e2a44, #2c3e50); /* Gradient background */
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh; /* Limit height for scrollability */
+  border-radius: 15px;
+  padding: 20px;
+  overflow-y: auto; /* Scroll if content overflows */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  font-family: 'Poppins', sans-serif; /* Assuming Poppins is available */
+  color: #fff;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #00d4ff; /* Vibrant cyan for title */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header p {
+  font-size: 1rem;
+  color: #b0c4de; /* Light blue-gray for description */
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex: 1; /* Take up available space */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1); /* Glassmorphism effect */
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); /* Glow effect on focus */
+}
+
+.search-bar .search-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  background: #00d4ff; /* Matching cyan theme */
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.search-bar .search-btn:hover {
+  transform: scale(1.05); /* Slight scale-up on hover */
+  background: #00b4d8; /* Darker cyan */
+}
+
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.repo-card {
+  background: rgba(255, 255, 255, 0.05); /* Subtle glass effect */
+  border-radius: 10px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.repo-card:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.repo-card.selected {
+  border: 2px solid #00d4ff; /* Highlight selected card */
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.repo-card h3 {
+  font-size: 1.2rem;
+  color: #00d4ff;
+  margin-bottom: 5px;
+}
+
+.repo-card p {
+  font-size: 0.9rem;
+  color: #b0c4de;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.back-btn, .confirm-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn {
+  background: #6c757d; /* Gray for back button */
+  color: #fff;
+}
+
+.back-btn:hover {
+  background: #5a6268; /* Darker gray on hover */
+}
+
+.confirm-btn {
+  background: #28a745; /* Green for confirm button */
+  color: #fff;
+}
+
+.confirm-btn:disabled {
+  background: #6c757d; /* Gray when disabled */
+  cursor: not-allowed;
+}
+
+.confirm-btn:not(:disabled):hover {
+  background: #218838; /* Darker green on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .modal-content {
+      width: 95%;
+      padding: 15px;
+  }
+
+  .header h1 {
+      font-size: 1.5rem;
+  }
+
+  .header p {
+      font-size: 0.9rem;
+  }
+
+  .search-bar {
+      flex-direction: column;
+  }
+
+  .search-bar input, .search-bar .search-btn {
+      width: 100%;
+  }
+
+  .repo-grid {
+      grid-template-columns: 1fr; /* Single column on small screens */
+  }
+
+  .footer {
+      flex-direction: column;
+  }
+
+  .back-btn, .confirm-btn {
+      width: 100%;
+  }
+}
+/* Existing styles assumed */
+.btn-danger {
+  background: #dc3545; /* Red for logout */
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #c82333; /* Darker red on hover */
 }
