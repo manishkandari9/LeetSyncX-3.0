@@ -9,58 +9,60 @@
 </head>
 <body>
     <div class="container">
-        <h1>LeetCode to GitHub</h1>
+        
+        <h1 id="title">Leet<span style="color: #ff6c0a;">Sync</span>  v3</h1>
+        </h1>
         <p class="description">Sync your LeetCode solutions to GitHub</p>
+        <div class="divider"></div>
 
+        <p class="btn-description" id="loginDescription">Authenticate with GitHub to use <strong>Leet <span style="color: #ff6c0a;">Sync</span></strong></p>
         <button id="loginGithub" class="btn btn-primary">
             <span class="icon" id="githubIcon"></span>
-            Login with GitHub
+            Authenticate
         </button>
-
+        <p class="btn-description" style="display: none;" id="setupHookDescription">Set up repository hook to use <strong>Leet <span style="color: #ff6c0a;">Sync</span></strong></p>
         <button id="setupHook" class="btn btn-secondary" style="display: none;">
             <span class="icon" id="setupIcon"></span>
-            Setup Auto Hook
+            Set up Hook
         </button>
-
+        
         <button id="saveSolution" class="btn btn-secondary" style="display: none;">
             <span class="icon" id="saveIcon"></span>
             Save Solution
         </button>
-        <button id="logoutButton" class="btn btn-danger" style="display: none;">
-            <span class="icon" id="logoutIcon"></span>
-            Logout
-        </button>
+    
         
 
-        <div class="info">
-            <p>Redirect URI: <span id="uriValue" class="uri-value"></span></p>
-        </div>
 
         <div class="status">
             <span class="icon spin" id="spinnerIcon"></span>
             <span id="status">Waiting for action...</span>
         </div>
-        <!-- Repository Selection Modal -->
-         <!-- Full-page Repository Selection UI -->
-        <!-- <div class="repo-container" id="repoContainer" style="display: none;">
-            <div class="repo-header">
-                <h2>Select Repository</h2>
-                <button id="closeRepo" class="close-btn">✖</button>
+
+        <div class="infoo">
+            <div class="icon-container">
+                <a href="https://github.com" target="_blank"><span class="iconn" id="githubSocialIcon"></span></a>
+                <a href="https://linkedin.com" target="_blank"><span class="iconn" id="linkedinIcon"></span></a>
+                <a href="mailto:support@example.com"><span class="iconn" id="emailIcon"></span></a>
+                <button id="logoutButton" class="btnn btn-danger" style="display: none;">
+                    <span class="iconn" id="logoutIcon"></span>
+                </button>
             </div>
+        </div>
+
+        <div class="repo-container" id="repoContainer">
             <div class="repo-content">
-                <div class="selected-repo" id="selectedRepo">
-                    <h3>Selected Repository</h3>
-                    <p id="selectedRepoName">None selected yet</p>
+                <div class="repo-header">
+                    <h2>Select Repository</h2>
+                    <button id="closeModal" class="close-btn">✖</button>
                 </div>
-                <div class="repo-selection">
-                    <div class="search-bar">
-                        <input type="text" id="repoSearch" placeholder="Search repositories...">
-                        <button class="search-btn">🔍</button>
-                    </div>
-                    <div class="repo-grid" id="repoGrid"></div>
+                <div class="search-bar">
+                    <input type="text" id="repoSearch" placeholder="Search repositories...">
                 </div>
+                <div id="repoGrid"></div>
+                <button id="confirmRepo" disabled>Confirm Selection</button>
             </div>
-        </div> -->
+        </div>
        
     </div>
 
