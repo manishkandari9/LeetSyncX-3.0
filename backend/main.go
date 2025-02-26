@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"io"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,13 +23,11 @@ var (
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️ Warning: Could not load .env file")
-	}
+	_ = godotenv.Load()
 
 	githubClientID = getEnv("GITHUB_CLIENT_ID")
 	githubClientSecret = getEnv("GITHUB_CLIENT_SECRET")
-	redirectURI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org" // Hardcoded to match Chrome extension
+	redirectURI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org"
 }
 
 func getEnv(key string) string {
@@ -37,10 +36,6 @@ func getEnv(key string) string {
 		log.Fatalf("❌ Missing environment variable: %s", key)
 	}
 	return value
-}
-
-func getGitHubLoginURL() string {
-	return fmt.Sprintf("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=repo", githubClientID, redirectURI)
 }
 
 func getGitHubAccessToken(code string) (string, error) {
@@ -55,25 +50,25 @@ func getGitHubAccessToken(code string) (string, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return "", fmt.Errorf("❌ Request creation failed: %v", err)
+		return "", err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("❌ Failed to fetch access token: %v", err)
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	var response map[string]string
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return "", fmt.Errorf("❌ Failed to parse response: %v", err)
+		return "", err
 	}
 
 	accessToken, exists := response["access_token"]
 	if !exists {
-		return "", fmt.Errorf("❌ No access token found in response")
+		return "", fmt.Errorf("no access token found")
 	}
 
 	return accessToken, nil
@@ -89,7 +84,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("❌ Failed to check file existence: %v", err)
+		return err
 	}
 	defer resp.Body.Close()
 
@@ -101,7 +96,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 	}
 
 	fileData := map[string]string{
-		"message": "🚀 Auto-update: " + fileName,
+		"message": "🚀 Auto-sync LeetCode solution: " + fileName,
 		"content": encodedContent,
 	}
 	if sha != "" {
@@ -111,7 +106,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 
 	req, err = http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("❌ Failed to create request: %v", err)
+		return err
 	}
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
@@ -119,12 +114,13 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 
 	resp, err = client.Do(req)
 	if err != nil {
-		return fmt.Errorf("❌ GitHub API request failed: %v", err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("❌ GitHub API error: %s", resp.Status)
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("❌ GitHub API error: %s, Response: %s", resp.Status, string(bodyBytes))
 	}
 
 	log.Println("✅ Successfully pushed to GitHub:", fileName)
@@ -141,10 +137,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-
-	r.GET("/login", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"url": getGitHubLoginURL()})
-	})
 
 	r.GET("/emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org", func(c *gin.Context) {
 		code := c.Query("code")
@@ -171,8 +163,8 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Invalid request"})
 			return
 		}
-		if req.Repo == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Repository is required"})
+		if req.Repo == "" || req.Filename == "" || req.Content == "" || req.AccessToken == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing required fields"})
 			return
 		}
 		err := pushToGitHub(req.AccessToken, req.Repo, req.Filename, req.Content)

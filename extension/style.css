@@ -515,3 +515,130 @@ cursor: default;
 .icon-container a:hover .icon svg {
   opacity: 0.8;
 }
+/* Add to your existing style.css */
+/* .sync-status {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+#syncMessage {
+  margin-bottom: 5px;
+}
+
+#repoName {
+  font-weight: 500;
+  color: #f3f4f6;
+  margin-bottom: 10px;
+}
+
+#problemsSolved {
+  margin-bottom: 5px;
+}
+
+#difficultyStats {
+  margin-bottom: 5px;
+}
+
+#featureRequest a {
+  color: #ff6c0a;
+  text-decoration: none;
+}
+
+#featureRequest a:hover {
+  text-decoration: underline;
+} */
+
+:root {
+  --text-color: #9ca3af;
+  --highlight-color: #f3f4f6;
+  --link-color: #ff6c0a;
+  --bg-color: #1e1e1e;
+  --hover-bg-color: #2d2d2d;
+  --transition-speed: 0.3s;
+}
+
+.sync-status {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-speed) ease;
+}
+
+.sync-status:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+#syncMessage {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--highlight-color);
+}
+
+#repoName {
+  font-weight: 500;
+  color: var(--highlight-color);
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+#problemsSolved,
+#difficultyStats {
+  margin-bottom: 5px;
+  background-color: var(--hover-bg-color);
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color var(--transition-speed) ease;
+}
+
+#problemsSolved:hover,
+#difficultyStats:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#featureRequest {
+  margin-top: 10px;
+}
+
+#featureRequest a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-speed) ease;
+}
+
+#featureRequest a:hover {
+  text-decoration: underline;
+  color: #ff8c3a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sync-status {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  #repoName {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sync-status {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  #repoName {
+    font-size: 14px;
+  }
+}
+

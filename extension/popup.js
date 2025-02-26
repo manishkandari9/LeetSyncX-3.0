@@ -1,19 +1,16 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const loginButton = document.getElementById("loginGithub");
-    const saveButton = document.getElementById("saveSolution");
     const setupHookButton = document.getElementById("setupHook");
     const setupHookDescription = document.getElementById("setupHookDescription");
     const loginDescription = document.getElementById("loginDescription");
-    // const logoutButton = document.getElementById("logoutButton");
     const title = document.getElementById("title");
-    const statusText = document.getElementById("status");
-    // const uriValue = document.getElementById("uriValue");
-    const modal = document.getElementById("repoContainer"); // Get modal reference
+    const syncMessage = document.getElementById("syncMessage");
+    const repoName = document.getElementById("repoName");
+    const problemsSolved = document.getElementById("problemsSolved");
+    const difficultyStats = document.getElementById("difficultyStats");
+    const featureRequest = document.getElementById("featureRequest");
+    const modal = document.getElementById("repoContainer");
 
-    console.log("✅ DOM Fully Loaded, Initializing Script...");
-    // uriValue.textContent = chrome.identity.getRedirectURL();
-
-    // Ensure modal is hidden on initial load
     if (modal) {
         modal.style.display = "none";
     }
@@ -26,42 +23,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (token) {
             loginButton.style.display = "none";
             loginDescription.style.display = "none";
-            // logoutButton.style.display = "inline-block";
             title.classList.add("logged-in");
             if (repo) {
                 setupHookButton.style.display = "none";
-                setupHookDescription.style.display = "none"; // Hide setup hook description
-                saveButton.style.display = "block";
-                statusText.innerText = `Logged in, selected repo: ${repo}`;
+                setupHookDescription.style.display = "none";
+                syncMessage.textContent = "Sync your code from LeetCode to GitHub";
+                repoName.textContent = repo;
+                repoName.style.display = "block";
+                problemsSolved.textContent = "Problems Solved: 0";
+                problemsSolved.style.display = "block";
+                difficultyStats.textContent = "Easy: 0  Medium: 0  Hard: 0";
+                difficultyStats.style.display = "block";
+                featureRequest.style.display = "block";
             } else {
                 setupHookButton.style.display = "block";
-                setupHookDescription.style.display = "block"; // Show setup hook description
-                saveButton.style.display = "none";
-                statusText.innerText = "Logged in, please setup hook";
+                setupHookDescription.style.display = "block";
+                syncMessage.textContent = "Logged in, please setup hook";
+                repoName.style.display = "none";
+                problemsSolved.style.display = "none";
+                difficultyStats.style.display = "none";
+                featureRequest.style.display = "none";
             }
         } else {
             loginButton.style.display = "block";
-            loginDescription.style.display = "block"; // Show authenticate description
-            logoutButton.style.display = "none";
+            loginDescription.style.display = "block";
+            title.classList.remove("logged-in");
             setupHookButton.style.display = "none";
-            setupHookDescription.style.display = "none"; // Hide setup hook description
-            saveButton.style.display = "none";
-            statusText.innerText = "Not Logged In! Please login first.";
+            setupHookDescription.style.display = "none";
+            syncMessage.textContent = "Not Logged In! Please login first.";
+            repoName.style.display = "none";
+            problemsSolved.style.display = "none";
+            difficultyStats.style.display = "none";
+            featureRequest.style.display = "none";
         }
     };
 
     const result = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
-    if (result.githubAccessToken) {
-        console.log("✅ GitHub Token Found! Auto-Logging In...");
-        updateUI(result.githubAccessToken, result.selectedRepo);
-    } else {
-        console.warn("❌ GitHub Token NOT Found! Please log in.");
-        updateUI(null, null);
-    }
+    updateUI(result.githubAccessToken, result.selectedRepo);
 
     loginButton?.addEventListener("click", () => {
-        console.log("🔗 Initiating GitHub OAuth...");
-        statusText.innerText = "Redirecting to GitHub...";
+        syncMessage.textContent = "Redirecting to GitHub...";
         const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=repo&response_type=code`;
 
         chrome.identity.launchWebAuthFlow({
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, async (redirectUrl) => {
             if (chrome.runtime.lastError) {
                 console.error("❌ OAuth Error:", chrome.runtime.lastError);
-                statusText.innerText = "OAuth Error!";
+                syncMessage.textContent = "OAuth Error!";
                 return;
             }
             const url = new URL(redirectUrl);
@@ -87,20 +88,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 } catch (error) {
                     console.error("❌ Error fetching token:", error);
-                    statusText.innerText = "Login Failed!";
+                    syncMessage.textContent = "Login Failed!";
                 }
             }
         });
     });
 
-    // Repository Selection - Only triggers on button click
     setupHookButton?.addEventListener("click", async () => {
         const token = await chrome.storage.sync.get("githubAccessToken");
         if (!token.githubAccessToken) {
             alert("Please log in first.");
             return;
         }
-        statusText.innerText = "Fetching repositories...";
+        syncMessage.textContent = "Fetching repositories...";
 
         const repoGrid = document.getElementById("repoGrid");
         const repoSearch = document.getElementById("repoSearch");
@@ -124,9 +124,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return response.data;
             };
 
-            repoGrid.innerHTML = ""; // Clear existing content
+            repoGrid.innerHTML = "";
             const repos = await fetchRepos();
-            console.log("✅ Repositories Fetched:", repos.length);
 
             repos.forEach(repo => {
                 const repoCard = document.createElement("div");
@@ -145,8 +144,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 repoGrid.appendChild(repoCard);
             });
 
-            modal.style.display = "flex"; // Show modal only when button is clicked
-            statusText.innerText = "Please select a repository.";
+            modal.style.display = "flex";
+            syncMessage.textContent = "Please select a repository.";
 
             repoSearch.addEventListener("input", (e) => {
                 const searchTerm = e.target.value.toLowerCase();
@@ -158,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             document.getElementById("closeModal").addEventListener("click", () => {
                 modal.style.display = "none";
-                statusText.innerText = "Logged in, please setup hook";
+                syncMessage.textContent = "Logged in, please setup hook";
             });
 
             confirmRepoBtn.addEventListener("click", () => {
@@ -173,103 +172,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
         } catch (error) {
-            console.error("❌ Error fetching repositories:", error);
+            console.error("Error fetching repositories:", error);
             alert("Failed to fetch repositories: " + error.message);
-            statusText.innerText = "Error fetching repositories.";
+            syncMessage.textContent = "Error fetching repositories.";
             modal.style.display = "none";
         }
     });
 
     title?.addEventListener("click", () => {
-        console.log("🔒 Logging out...");
-        chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
-            console.log("✅ Logged out! Cleared GitHub token and selected repo.");
-            updateUI(null, null);
-            statusText.innerText = "Logged out successfully!";
-        });
-    });
-
-    saveButton?.addEventListener("click", async () => {
-        console.log("✅ Save Solution Button Clicked!");
-        statusText.innerText = "Fetching solution from LeetCode...";
-
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (!tab || !tab.url.includes("leetcode.com/problems")) {
-            console.error("❌ Not on a LeetCode problem page!");
-            alert("Error: Please open a LeetCode problem page!");
-            return;
-        }
-
-        try {
-            const response = await new Promise((resolve) => {
-                chrome.tabs.sendMessage(tab.id, { action: "save_solution" }, (resp) => {
-                    if (chrome.runtime.lastError) {
-                        console.error("❌ Chrome Runtime Error:", chrome.runtime.lastError.message);
-                        resolve({ status: "error", message: chrome.runtime.lastError.message });
-                    } else {
-                        console.log("✅ Response from content script:", resp);
-                        resolve(resp);
-                    }
-                });
+        if (title.classList.contains("logged-in")) {
+            chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
+                updateUI(null, null);
             });
-
-            if (response.status !== "success") {
-                console.error("❌ Failed to extract solution:", response.message);
-                alert("Error: " + (response.message || "Failed to extract solution!"));
-                return;
-            }
-
-            console.log("✅ Solution Extracted Successfully:", response);
-            statusText.innerText = "Solution extracted! Uploading to GitHub...";
-
-            const { title, number, code, language } = response;
-            const problemTitle = title.replace(/[^a-zA-Z0-9_]/g, "_") || "Unknown_Problem";
-            const problemNumber = number || "000";
-            const codeContent = code?.trim();
-
-            if (!codeContent) {
-                alert("Error: No code content found!");
-                return;
-            }
-
-            const extensionMap = {
-                "cpp": "cpp",
-                "java": "java",
-                "py": "py",
-                "js": "js"
-            };
-            const fileExtension = extensionMap[language];
-            if (!fileExtension) {
-                console.error("❌ Unsupported language:", language);
-                alert("Error: Unsupported language detected!");
-                return;
-            }
-
-            const fileName = `${problemNumber}_${problemTitle}.${fileExtension}`;
-
-            const { githubAccessToken, selectedRepo } = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
-            if (!githubAccessToken || !selectedRepo) {
-                alert("Error: Authentication or repository selection required!");
-                return;
-            }
-
-            console.log("✅ Uploading to GitHub via Backend...");
-            const saveResponse = await axios.post(`${BACKEND_URL}/save`, {
-                access_token: githubAccessToken,
-                filename: fileName,
-                content: codeContent,   
-                repo: selectedRepo
-            });
-            const saveData = saveResponse.data;
-            if (saveData.message) {
-                console.log("✅ Solution Saved:", saveData.message);
-                statusText.innerText = "Solution Saved on GitHub!";
-                alert("Solution Saved on GitHub!");
-            }
-        } catch (error) {
-            console.error("❌ Error uploading to GitHub:", error);
-            statusText.innerText = "Error uploading solution.";
-            alert("Error: " + (error.response?.data.error || error.message));
         }
     });
 });

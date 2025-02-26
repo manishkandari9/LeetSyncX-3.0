@@ -3,36 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeetCode to GitHub</title>
+    <title>LeetSync</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        
-        <h1 id="title">Leet<span style="color: #ff6c0a;">Sync</span>  v3</h1>
-        </h1>
+        <button id="logoutButton" class="btn-logout" style="display: none;">
+            <span class="icon" id="logoutIcon"></span>
+        </button>
+        <h1 id="title">Leet<span style="color: #3fff0a;">Sync</span>  </h1>
         <p class="description">Sync your LeetCode solutions to GitHub</p>
         <div class="divider"></div>
 
-        <p class="btn-description" id="loginDescription">Authenticate with GitHub to use <strong>Leet <span style="color: #ff6c0a;">Sync</span></strong></p>
+        <p class="btn-description" id="loginDescription">Authenticate with GitHub to use <strong>Leet <span style="color: #3fff0a;">Sync</span></strong></p>
         <button id="loginGithub" class="btn btn-primary">
             <span class="icon" id="githubIcon"></span>
             Authenticate
         </button>
-        <p class="btn-description" style="display: none;" id="setupHookDescription">Set up repository hook to use <strong>Leet <span style="color: #ff6c0a;">Sync</span></strong></p>
+        <p class="btn-description" style="display: none;" id="setupHookDescription">Set up repository hook to use <strong>Leet <span style="color: #3fff0a;">Sync</span></strong></p>
         <button id="setupHook" class="btn btn-secondary" style="display: none;">
             <span class="icon" id="setupIcon"></span>
             Set up Hook
         </button>
-        
-        <button id="saveSolution" class="btn btn-secondary" style="display: none;">
-            <span class="icon" id="saveIcon"></span>
-            Save Solution
-        </button>
-    
-        
 
+        <div class="sync-status" id="syncStatus">
+            <p id="syncMessage">Waiting for action...</p>
+            <p id="repoName" style="display: none;"></p>
+            <p id="problemsSolved" style="display: none;">Problems Solved: 0</p>
+            <p id="difficultyStats" style="display: none;">Easy: 0 &nbsp; Medium: 0 &nbsp; Hard: 0</p>
+            <p id="featureRequest" style="display: none;">Want more features? <a href="https://github.com/manishkandari9/LeetCode-to-GitHub/issues" target="_blank">Request a feature!</a></p>
+        </div>
 
         <div class="status">
             <span class="icon spin" id="spinnerIcon"></span>
@@ -44,9 +45,6 @@
                 <a href="https://github.com" target="_blank"><span class="iconn" id="githubSocialIcon"></span></a>
                 <a href="https://linkedin.com" target="_blank"><span class="iconn" id="linkedinIcon"></span></a>
                 <a href="mailto:support@example.com"><span class="iconn" id="emailIcon"></span></a>
-                <button id="logoutButton" class="btnn btn-danger" style="display: none;">
-                    <span class="iconn" id="logoutIcon"></span>
-                </button>
             </div>
         </div>
 
@@ -63,7 +61,6 @@
                 <button id="confirmRepo" disabled>Confirm Selection</button>
             </div>
         </div>
-       
     </div>
 
     <script src="icon.js"></script>
@@ -73,4 +70,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-

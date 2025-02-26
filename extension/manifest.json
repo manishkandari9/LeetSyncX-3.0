@@ -4,7 +4,7 @@
     "version": "1.1",
     "description": "Automatically push LeetCode solutions to GitHub",
     "permissions": [
-        "storage", "activeTab", "scripting", "identity"
+        "storage", "activeTab", "identity", "notifications", "scripting"
     ],
     "host_permissions": [
         "https://leetcode.com/*",
@@ -24,15 +24,9 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://leetcode.com/problems/*"],
-            "js": ["content.js"],
+          "matches": ["*://leetcode.com/problems/*"],
+            "js": ["content.js", "axios.min.js"],
             "run_at": "document_idle"
-        }
-    ],
-    "web_accessible_resources": [
-        {
-            "resources": ["popup.html"],
-            "matches": ["<all_urls>"]
         }
     ],
     "content_security_policy": {
