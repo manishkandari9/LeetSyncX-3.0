@@ -7,7 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const syncMessage = document.getElementById("syncMessage");
     const repoName = document.getElementById("repoName");
     const problemsSolved = document.getElementById("problemsSolved");
-    const difficultyStats = document.getElementById("difficultyStats");
+    const difficultyContainer = document.querySelector(".difficulty-container");
+    const easyBtn = document.getElementById("easyBtn");
+    const mediumBtn = document.getElementById("mediumBtn");
+    const hardBtn = document.getElementById("hardBtn");
     const featureRequest = document.getElementById("featureRequest");
     const modal = document.getElementById("repoContainer");
 
@@ -32,8 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 repoName.style.display = "block";
                 problemsSolved.textContent = "Problems Solved: 0";
                 problemsSolved.style.display = "block";
-                difficultyStats.textContent = "Easy: 0  Medium: 0  Hard: 0";
-                difficultyStats.style.display = "block";
+                difficultyContainer.style.display = "flex";
+                easyBtn.style.display = "inline-block";
+                mediumBtn.style.display = "inline-block";
+                hardBtn.style.display = "inline-block";
                 featureRequest.style.display = "block";
             } else {
                 setupHookButton.style.display = "block";
@@ -41,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 syncMessage.textContent = "Logged in, please setup hook";
                 repoName.style.display = "none";
                 problemsSolved.style.display = "none";
-                difficultyStats.style.display = "none";
+                difficultyContainer.style.display = "none";
                 featureRequest.style.display = "none";
             }
         } else {
@@ -53,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             syncMessage.textContent = "Not Logged In! Please login first.";
             repoName.style.display = "none";
             problemsSolved.style.display = "none";
-            difficultyStats.style.display = "none";
+            difficultyContainer.style.display = "none";
             featureRequest.style.display = "none";
         }
     };

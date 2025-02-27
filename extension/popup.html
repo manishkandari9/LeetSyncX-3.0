@@ -14,6 +14,7 @@
         </button>
         <h1 id="title">Leet<span style="color: #3fff0a;">Sync</span>  </h1>
         <p class="description">Sync your LeetCode solutions to GitHub</p>
+        <p id="repoName" style="display: none;"></p>
         <div class="divider"></div>
 
         <p class="btn-description" id="loginDescription">Authenticate with GitHub to use <strong>Leet <span style="color: #3fff0a;">Sync</span></strong></p>
@@ -28,11 +29,15 @@
         </button>
 
         <div class="sync-status" id="syncStatus">
-            <p id="syncMessage">Waiting for action...</p>
-            <p id="repoName" style="display: none;"></p>
-            <p id="problemsSolved" style="display: none;">Problems Solved: 0</p>
-            <p id="difficultyStats" style="display: none;">Easy: 0 &nbsp; Medium: 0 &nbsp; Hard: 0</p>
-            <p id="featureRequest" style="display: none;">Want more features? <a href="https://github.com/manishkandari9/LeetCode-to-GitHub/issues" target="_blank">Request a feature!</a></p>
+            <p id="syncMessage" style="display: none;">Waiting for action...</p>
+            <p id="problemsSolved">Problems Solved: 1</p>
+            <div  class="difficulty-container">
+                <button id="easyBtn" class="difficulty-btn easy">Easy: 1</button>
+                <button id="mediumBtn" class="difficulty-btn medium">Medium: 0</button>
+                <button id="hardBtn" class="difficulty-btn hard">Hard: 0</button>
+            </div>
+        
+            <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p>
         </div>
 
         <div class="status">

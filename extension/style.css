@@ -515,130 +515,96 @@ cursor: default;
 .icon-container a:hover .icon svg {
   opacity: 0.8;
 }
-/* Add to your existing style.css */
-/* .sync-status {
-  margin-top: 20px;
+
+.sync-status {
+  color: white;
+  padding: 1px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
   text-align: center;
-  font-size: 14px;
-  color: #9ca3af;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sync-status p {
+  margin: 10px 0;
+  transition: all 0.3s ease-in-out;
 }
 
 #syncMessage {
-  margin-bottom: 5px;
-}
-
-#repoName {
-  font-weight: 500;
-  color: #f3f4f6;
-  margin-bottom: 10px;
+  font-size: 16px;
+  font-style: italic;
+  color: #ffeb3b;
 }
 
 #problemsSolved {
-  margin-bottom: 5px;
-}
-
-#difficultyStats {
-  margin-bottom: 5px;
-}
-
-#featureRequest a {
-  color: #ff6c0a;
-  text-decoration: none;
-}
-
-#featureRequest a:hover {
-  text-decoration: underline;
-} */
-
-:root {
-  --text-color: #9ca3af;
-  --highlight-color: #f3f4f6;
-  --link-color: #ff6c0a;
-  --bg-color: #1e1e1e;
-  --hover-bg-color: #2d2d2d;
-  --transition-speed: 0.3s;
-}
-
-.sync-status {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-color);
-  background-color: var(--bg-color);
-  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  /* padding: 10px; */
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-speed) ease;
+  display: inline-block;
 }
 
-.sync-status:hover {
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+.difficulty-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
 }
 
-#syncMessage {
-  margin-bottom: 5px;
-  font-weight: 600;
-  color: var(--highlight-color);
+.difficulty-btn {
+  border: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 300;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 10px;
 }
 
-#repoName {
-  font-weight: 500;
-  color: var(--highlight-color);
-  margin-bottom: 10px;
-  font-size: 16px;
+/* Button Colors */
+.easy {
+  background: linear-gradient(135deg, #28a745, #34d058);
+  color: white;
 }
 
-#problemsSolved,
-#difficultyStats {
-  margin-bottom: 5px;
-  background-color: var(--hover-bg-color);
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color var(--transition-speed) ease;
+.medium {
+  background: linear-gradient(135deg, #ff9800, #ffb74d);
+  color: white;
 }
 
-#problemsSolved:hover,
-#difficultyStats:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.hard {
+  background: linear-gradient(135deg, #e53935, #ff5252);
+  color: white;
+}
+
+/* Hover Effects */
+.easy:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.medium:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+.hard:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(229, 57, 53, 0.4);
 }
 
 #featureRequest {
-  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #00e5ff;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
 }
-
-#featureRequest a {
-  color: var(--link-color);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color var(--transition-speed) ease;
-}
-
-#featureRequest a:hover {
-  text-decoration: underline;
-  color: #ff8c3a;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .sync-status {
-    font-size: 13px;
-    padding: 12px;
-  }
-
-  #repoName {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .sync-status {
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  #repoName {
-    font-size: 14px;
-  }
-}
-
