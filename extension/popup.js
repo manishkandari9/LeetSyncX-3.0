@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const easyBtn = document.getElementById("easyBtn");
     const mediumBtn = document.getElementById("mediumBtn");
     const hardBtn = document.getElementById("hardBtn");
-    const featureRequest = document.getElementById("featureRequest");
     const modal = document.getElementById("repoContainer");
 
     if (modal) {
@@ -22,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const REDIRECT_URI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org";
     const BACKEND_URL = "http://localhost:8080";
 
-    const updateUI = (token, repo) => {
+    const leetSyncUpdateUI = (token, repo) => {
         if (token) {
             loginButton.style.display = "none";
             loginDescription.style.display = "none";
@@ -33,13 +32,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 syncMessage.textContent = "Sync your code from LeetCode to GitHub";
                 repoName.textContent = repo;
                 repoName.style.display = "block";
-                problemsSolved.textContent = "Problems Solved: 0";
                 problemsSolved.style.display = "block";
                 difficultyContainer.style.display = "flex";
                 easyBtn.style.display = "inline-block";
                 mediumBtn.style.display = "inline-block";
                 hardBtn.style.display = "inline-block";
-                featureRequest.style.display = "block";
             } else {
                 setupHookButton.style.display = "block";
                 setupHookDescription.style.display = "block";
@@ -47,7 +44,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 repoName.style.display = "none";
                 problemsSolved.style.display = "none";
                 difficultyContainer.style.display = "none";
-                featureRequest.style.display = "none";
             }
         } else {
             loginButton.style.display = "block";
@@ -59,12 +55,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             repoName.style.display = "none";
             problemsSolved.style.display = "none";
             difficultyContainer.style.display = "none";
-            featureRequest.style.display = "none";
         }
     };
 
     const result = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
-    updateUI(result.githubAccessToken, result.selectedRepo);
+    leetSyncUpdateUI(result.githubAccessToken, result.selectedRepo);
 
     loginButton?.addEventListener("click", () => {
         syncMessage.textContent = "Redirecting to GitHub...";
@@ -75,8 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             interactive: true
         }, async (redirectUrl) => {
             if (chrome.runtime.lastError) {
-                console.error("❌ OAuth Error:", chrome.runtime.lastError);
-                syncMessage.textContent = "OAuth Error!";
+                syncMessage.textContent = "Authentication failed";
                 return;
             }
             const url = new URL(redirectUrl);
@@ -87,13 +81,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const data = response.data;
                     if (data.success && data.access_token) {
                         chrome.storage.sync.set({ githubAccessToken: data.access_token }, () => {
-                            console.log("✅ GitHub Access Token Stored!");
-                            updateUI(data.access_token, null);
+                            leetSyncUpdateUI(data.access_token, null);
                         });
                     }
                 } catch (error) {
-                    console.error("❌ Error fetching token:", error);
-                    syncMessage.textContent = "Login Failed!";
+                    syncMessage.textContent = "Login processing failed";
                 }
             }
         });
@@ -102,7 +94,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupHookButton?.addEventListener("click", async () => {
         const token = await chrome.storage.sync.get("githubAccessToken");
         if (!token.githubAccessToken) {
-            alert("Please log in first.");
             return;
         }
         syncMessage.textContent = "Fetching repositories...";
@@ -110,28 +101,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         const repoGrid = document.getElementById("repoGrid");
         const repoSearch = document.getElementById("repoSearch");
         const confirmRepoBtn = document.getElementById("confirmRepo");
+        const createRepoBtn = document.getElementById("createRepoBtn");
+        const createRepoForm = document.getElementById("createRepoForm");
+        const newRepoName = document.getElementById("newRepoName");
+        const repoVisibility = document.getElementById("repoVisibility");
+        const submitNewRepo = document.getElementById("submitNewRepo");
+        const cancelNewRepo = document.getElementById("cancelNewRepo");
+        const searchBar = document.querySelector(".search-bar");
+        const repoheader = document.getElementById("repoheader");
+        
         let selectedRepo = null;
 
-        try {
-            const fetchRepos = async (page = 1, perPage = 100) => {
-                const response = await axios.get("https://api.github.com/user/repos", {
-                    headers: {
-                        Authorization: `Bearer ${token.githubAccessToken}`,
-                        Accept: "application/vnd.github.v3+json"
-                    },
-                    params: {
-                        per_page: perPage,
-                        page: page,
-                        sort: "updated",
-                        direction: "desc"
-                    }
-                });
-                return response.data;
-            };
+        const leetSyncFetchRepos = async (page = 1, perPage = 100) => {
+            const response = await axios.get("https://api.github.com/user/repos", {
+                headers: {
+                    Authorization: `Bearer ${token.githubAccessToken}`,
+                    Accept: "application/vnd.github.v3+json"
+                },
+                params: {
+                    per_page: perPage,
+                    page: page,
+                    sort: "updated",
+                    direction: "desc"
+                }
+            });
+            return response.data;
+        };
 
+        const leetSyncRenderRepos = async () => {
             repoGrid.innerHTML = "";
-            const repos = await fetchRepos();
-
+            const repos = await leetSyncFetchRepos();
             repos.forEach(repo => {
                 const repoCard = document.createElement("div");
                 repoCard.className = "repo-card";
@@ -148,7 +147,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
                 repoGrid.appendChild(repoCard);
             });
+        };
 
+        try {
+            await leetSyncRenderRepos();
             modal.style.display = "flex";
             syncMessage.textContent = "Please select a repository.";
 
@@ -168,27 +170,82 @@ document.addEventListener("DOMContentLoaded", async () => {
             confirmRepoBtn.addEventListener("click", () => {
                 if (selectedRepo) {
                     chrome.storage.sync.set({ selectedRepo }, () => {
-                        console.log("✅ Repository Selected:", selectedRepo);
-                        alert("Repository selected: " + selectedRepo);
-                        updateUI(token.githubAccessToken, selectedRepo);
+                        leetSyncUpdateUI(token.githubAccessToken, selectedRepo);
                         modal.style.display = "none";
                     });
                 }
             });
 
+            createRepoBtn.addEventListener("click", () => {
+                createRepoForm.style.display = "block";
+                repoGrid.style.display = "none";
+                confirmRepoBtn.style.display = "none";
+                createRepoBtn.style.display = "none";
+                searchBar.style.display = "none";
+                repoheader.style.display = "block";
+                repoheader.textContent = "Create New Repository";
+            });
+
+            cancelNewRepo.addEventListener("click", () => {
+                createRepoForm.style.display = "none";
+                repoGrid.style.display = "block";
+                confirmRepoBtn.style.display = "block";
+                createRepoBtn.style.display = "block";
+                searchBar.style.display = "block";
+                repoheader.textContent = "Select Repository";
+                newRepoName.value = "";
+            });
+
+            submitNewRepo.addEventListener("click", async () => {
+                const repoNameValue = newRepoName.value.trim();
+                const isPrivate = repoVisibility.value === "private";
+
+                if (!repoNameValue) {
+                    return;
+                }
+
+                try {
+                    const response = await axios.post(
+                        "https://api.github.com/user/repos",
+                        {
+                            name: repoNameValue,
+                            private: isPrivate,
+                            auto_init: true
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token.githubAccessToken}`,
+                                Accept: "application/vnd.github.v3+json"
+                            }
+                        }
+                    );
+
+                    const newRepoFullName = response.data.full_name;
+                    chrome.storage.sync.set({ selectedRepo: newRepoFullName }, () => {
+                        leetSyncUpdateUI(token.githubAccessToken, newRepoFullName);
+                        modal.style.display = "none";
+                    });
+                } catch (error) {
+                    createRepoForm.style.display = "none";
+                    repoGrid.style.display = "block";
+                    confirmRepoBtn.style.display = "block";
+                    createRepoBtn.style.display = "block";
+                    searchBar.style.display = "block";
+                    repoheader.textContent = "Select Repository";
+                    newRepoName.value = "";
+                }
+            });
         } catch (error) {
-            console.error("Error fetching repositories:", error);
-            alert("Failed to fetch repositories: " + error.message);
-            syncMessage.textContent = "Error fetching repositories.";
             modal.style.display = "none";
+            syncMessage.textContent = "Repository fetch failed";
         }
     });
 
     title?.addEventListener("click", () => {
         if (title.classList.contains("logged-in")) {
             chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
-                updateUI(null, null);
+                leetSyncUpdateUI(null, null);
             });
         }
     });
-});
+})

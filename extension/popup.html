@@ -35,9 +35,9 @@
                 <button id="easyBtn" class="difficulty-btn easy">Easy: 1</button>
                 <button id="mediumBtn" class="difficulty-btn medium">Medium: 0</button>
                 <button id="hardBtn" class="difficulty-btn hard">Hard: 0</button>
-            </div>
+            </div>  
         
-            <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p>
+            <!-- <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p> -->
         </div>
 
         <div class="status">
@@ -56,12 +56,47 @@
         <div class="repo-container" id="repoContainer">
             <div class="repo-content">
                 <div class="repo-header">
-                    <h2>Select Repository</h2>
+                    <h2 id="repoheader">Select Repository</h2>
                     <button id="closeModal" class="close-btn">✖</button>
                 </div>
                 <div class="search-bar">
                     <input type="text" id="repoSearch" placeholder="Search repositories...">
                 </div>
+                <div class="repo-creation-container">
+                    <button id="createRepoBtn" class=" btn create-repo-btn">
+                      <!-- <span class="btn-icon">+</span> -->
+                      <span class="btn-text">Create New Repo</span>
+                    </button>
+                    
+                    <div id="createRepoForm" class="create-repo-form">
+                      <div class="form-header">
+                        <p>A repository contains all project files and revision history</p>
+                      </div>
+                      
+                      <div class="form-group">
+                        <label for="newRepoName">Repository name</label>
+                        <input 
+                          type="text" 
+                          id="newRepoName" 
+                          placeholder="Leet-sync-1000" 
+                          class="form-control"
+                        />
+                      </div>
+                      
+                      <div class="form-group">
+                        <label for="repoVisibility">Visibility</label>
+                        <select id="repoVisibility" class="form-control">
+                          <option value="public">Public</option>
+                          <option value="private">Private</option>
+                        </select>
+                      </div>
+                      
+                      <div class="form-actions">
+                        <button id="cancelNewRepo" class="btn btn-cancel">Cancel</button>
+                        <button id="submitNewRepo" class="btn btn-create">Create repo</button>
+                      </div>
+                    </div>
+                  </div>
                 <div id="repoGrid"></div>
                 <button id="confirmRepo" disabled>Confirm Selection</button>
             </div>
