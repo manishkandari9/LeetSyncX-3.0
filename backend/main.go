@@ -15,7 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
-
 var (
 	githubClientID     string
 	githubClientSecret string
@@ -23,7 +22,8 @@ var (
 )
 
 func init() {
-	_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+	}
 
 	githubClientID = getEnv("GITHUB_CLIENT_ID")
 	githubClientSecret = getEnv("GITHUB_CLIENT_SECRET")
@@ -33,7 +33,7 @@ func init() {
 func getEnv(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		log.Fatalf("❌ Missing environment variable: %s", key)
+		log.Fatalf("Missing environment variable: %s", key)
 	}
 	return value
 }
