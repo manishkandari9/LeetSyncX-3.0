@@ -96,7 +96,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 	}
 
 	fileData := map[string]string{
-		"message": "🚀 Auto-sync LeetCode solution: " + fileName,
+		"message": " Auto-sync LeetCode solution: " + fileName,
 		"content": encodedContent,
 	}
 	if sha != "" {
@@ -123,7 +123,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 		return fmt.Errorf("❌ GitHub API error: %s, Response: %s", resp.Status, string(bodyBytes))
 	}
 
-	log.Println("✅ Successfully pushed to GitHub:", fileName)
+	log.Println("Successfully pushed to GitHub:", fileName)
 	return nil
 }
 
@@ -141,7 +141,7 @@ func main() {
 	r.GET("/emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org", func(c *gin.Context) {
 		code := c.Query("code")
 		if code == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing authorization code"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing authorization code"})
 			return
 		}
 		accessToken, err := getGitHubAccessToken(code)
@@ -164,7 +164,7 @@ func main() {
 			return
 		}
 		if req.Repo == "" || req.Filename == "" || req.Content == "" || req.AccessToken == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "❌ Missing required fields"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
 			return
 		}
 		err := pushToGitHub(req.AccessToken, req.Repo, req.Filename, req.Content)
@@ -175,6 +175,6 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "✅ Solution saved to GitHub"})
 	})
 
-	log.Println("🚀 Server running on port 8080...")
+	log.Println("Server running on port 8080...")
 	r.Run(":8080")
 }
