@@ -150,23 +150,27 @@ body {
   word-break: break-all;
 }
 
-.status {
+/* .status {
   align-items: center;
   justify-content: center;
   margin-top: 20px;
   font-size: 14px;
   color: var(--status-color);
-}
+} */
 
 .spin {
-  animation: spin 3s linear infinite;
-  margin-right: 2px;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem; /* Matches mr-2 */
+  width: 8px;
+  height: 8px;
+  border: 1px solid #fff;
+  border-top: 1.5px solid #3b82f6; /* Matches blue-500 */
+  border-radius: 50%;
 }
 
 @keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 400px) {
@@ -550,7 +554,7 @@ body {
 
 .infoo {
   position: relative;
-  min-height: 80px;
+  /* margin-top: 5rem; */
   text-align: center;
 }
 
@@ -575,8 +579,8 @@ body {
 
 .icon {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   vertical-align: middle;
 }
 
@@ -923,4 +927,31 @@ select.form-control {
 #logoutIcon {
   width: 14px !important; 
   height: 14px !important;
+}
+
+
+#featureRequest {
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+#featureRequest a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+#featureRequest a:hover {
+  text-decoration: underline;
+  color: var(--hover-accent);
+}
+
+.status {
+  margin-top: 20px;
+  margin-bottom: 20px; /* Added for spacing */
+}
+
+.infoo {
+  margin-top: 3rem; /* Adjusted for better flow */
 }
