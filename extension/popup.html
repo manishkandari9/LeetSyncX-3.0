@@ -27,6 +27,31 @@
             <span class="icon" id="setupIcon"></span>
             Set up Hook
         </button>
+        <button
+        id="logoutButton"
+        class="absolute top-4 right-4 p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition-all shadow-md"
+        style="display: none;"
+        aria-label="Logout"
+    >
+        <span class="logicon" id="logoutIcon">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"  
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide-logout"
+            >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" x2="9" y1="12" y2="12"/>
+            </svg>
+        </span>
+    </button>
 
         <div class="sync-status" id="syncStatus">
             <p id="syncMessage" style="display: none;">Waiting for action...</p>
@@ -36,9 +61,10 @@
                 <button id="mediumBtn" class="difficulty-btn medium">Medium: 0</button>
                 <button id="hardBtn" class="difficulty-btn hard">Hard: 0</button>
             </div>  
+
         
             <!-- <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p> -->
-        </div>
+          </div>
 
         <div class="status">
             <span class="icon spin" id="spinnerIcon"></span>

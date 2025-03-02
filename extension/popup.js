@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const setupHookButton = document.getElementById("setupHook");
     const setupHookDescription = document.getElementById("setupHookDescription");
     const loginDescription = document.getElementById("loginDescription");
-    const title = document.getElementById("title");
+    const logoutButton = document.getElementById("logoutButton");
     const syncMessage = document.getElementById("syncMessage");
     const repoName = document.getElementById("repoName");
     const problemsSolved = document.getElementById("problemsSolved");
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (token) {
             loginButton.style.display = "none";
             loginDescription.style.display = "none";
-            title.classList.add("logged-in");
+            logoutButton.style.display = "block";
             if (repo) {
                 setupHookButton.style.display = "none";
                 setupHookDescription.style.display = "none";
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             loginButton.style.display = "block";
             loginDescription.style.display = "block";
-            title.classList.remove("logged-in");
+            logoutButton.style.display = "none";
             setupHookButton.style.display = "none";
             setupHookDescription.style.display = "none";
             syncMessage.textContent = "Not Logged In! Please login first.";
@@ -241,11 +241,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    title?.addEventListener("click", () => {
-        if (title.classList.contains("logged-in")) {
-            chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
-                leetSyncUpdateUI(null, null);
-            });
-        }
+    logoutButton?.addEventListener("click", () => {
+        chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
+            leetSyncUpdateUI(null, null);
+        });
     });
 })

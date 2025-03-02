@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Streak</title>
+    <style>
+        /* Toggle Button Styling */
+        #toggleStreak {
+            display: none; /* Checkbox ko hide karte hain */
+        }
+
+        .btn-streak {
+            background-color: #3fff0a;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* Background styles */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            z-index: -2;
+            border-radius: 15px;
+        }
+
+        .background::before,
+        .background::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .background::before {
+            background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 8%),
+                        radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 8%),
+                        radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 8%),
+                        radial-gradient(circle at 70% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 8%),
+                        radial-gradient(circle at 10% 60%, rgba(255, 255, 255, 0.1) 0%, transparent 8%),
+                        radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 8%);
+        }
+
+        .background::after {
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 10%),
+                        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 10%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 10%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 10%),
+                        radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 10%);
+        }
+
+        /* Streak container styles */
+        .streak-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+        }
+
+        #toggleStreak:checked + .btn-streak + .streak-container {
+            display: block; /* Checkbox checked hone par dikhega */
+        }
+
+        /* Header styles */
+        .header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        /* Streak counter styles */
+        .streak-counter {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .streak-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        .streak-number {
+            position: relative;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            z-index: 1;
+        }
+
+        /* Motivational message styles */
+        .motivational-message {
+            text-align: center;
+            margin-bottom: 25px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .motivational-message p {
+            color: white;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 70%;
+            background: linear-gradient(90deg, #fbbf24 0%, #f97316 100%);
+            border-radius: 10px;
+            animation: progressFill 2s ease-in;
+        }
+
+        /* Badges section styles */
+        .badges-section {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .badges-title {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .badges-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 5px 0;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .badges-container::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .badges-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .badges-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .badge {
+            min-width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.2);
+        }
+
+        .badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(transparent, transparent, transparent, rgba(255, 255, 255, 0.3));
+            transform: rotate(45deg);
+            animation: shine 2s infinite;
+        }
+
+        .badge-icon {
+            font-size: 20px;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .badge-text {
+            font-size: 8px;
+            color: white;
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        /* Button styles */
+        .github-button {
+            padding: 10px 20px;
+            background: transparent;
+            color: #22c55e;
+            border: 2px solid #22c55e;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+        }
+
+        .github-button:hover {
+            background: rgba(34, 197, 94, 0.1);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.8);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes progressFill {
+            from { width: 0; }
+            to { width: 70%; }
+        }
+
+        @keyframes shine {
+            0% { top: -100%; left: -100%; }
+            20% { top: 100%; left: 100%; }
+            100% { top: 100%; left: 100%; }
+        }
+
+        /* Container for standalone page */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <input type="checkbox" id="toggleStreak">
+        <label for="toggleStreak" class="btn btn-streak">Show Streak</label>
+        <div class="streak-container">
+            <div class="background"></div>
+            <div class="header">
+                <h1>LeetCode Streak</h1>
+            </div>
+            <div class="streak-counter">
+                <div class="streak-circle"></div>
+                <div class="streak-number">Day 7</div>
+            </div>
+            <div class="motivational-message">
+                <p>Keep it going, champ!</p>
+            </div>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Progress to next milestone</span>
+                    <span>7/10 days</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+            <div class="badges-section">
+                <div class="badges-title">Your Achievements</div>
+                <div class="badges-container">
+                    <div class="badge">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-text">7-Day Streak</div>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon">⭐</div>
+                        <div class="badge-text">10 Problems</div>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon">🏆</div>
+                        <div class="badge-text">Hard Problem</div>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon">🚀</div>
+                        <div class="badge-text">Fast Solver</div>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon">🧠</div>
+                        <div class="badge-text">DP Master</div>
+                    </div>
+                </div>
+            </div>
+            <button class="github-button">Push to GitHub</button>
+        </div>
+    </div>
+</body>
+</html>

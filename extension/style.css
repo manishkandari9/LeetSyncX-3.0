@@ -870,3 +870,57 @@ select.form-control {
     font-size: 13px;
   }
 }
+
+
+
+:root {
+  --gray-700: #4b5563; /* Original */
+  --gray-600: #374151; /* Hover */
+  --text-color: #f3f4f6; /* Icon stroke */
+}
+
+/* Logout button styles */
+#logoutButton {
+  position: absolute;
+  top: 16px; 
+  right: 16px;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: var(--gray-700);
+  transition: background-color 0.3s ease, transform 0.2s ease; 
+  cursor: pointer;
+  width: 32px; 
+  height: 32px; 
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); 
+  border: 1px solid var(--gray-700);
+}
+
+#logoutButton:hover {
+  background-color: var(--gray-600);
+  transform: scale(1.1); 
+}
+
+#logoutIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; 
+  height: 18px;
+  background: transparent; 
+}
+
+#logoutIcon svg {
+  stroke: var(--text-color); 
+  stroke-width: 3.5px;
+}
+
+
+
+#logoutIcon {
+  width: 14px !important; 
+  height: 14px !important;
+}
