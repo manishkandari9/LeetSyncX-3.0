@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mediumBtn = document.getElementById("mediumBtn");
     const hardBtn = document.getElementById("hardBtn");
     const modal = document.getElementById("repoContainer");
+    const streak = document.getElementById("streak");
 
     if (modal) {
         modal.style.display = "none";
@@ -37,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 easyBtn.style.display = "inline-block";
                 mediumBtn.style.display = "inline-block";
                 hardBtn.style.display = "inline-block";
+                streak.style.display = "block";
             } else {
                 setupHookButton.style.display = "block";
                 setupHookDescription.style.display = "block";
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 repoName.style.display = "none";
                 problemsSolved.style.display = "none";
                 difficultyContainer.style.display = "none";
+                  streak.style.display = "none";
             }
         } else {
             loginButton.style.display = "block";
@@ -55,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             repoName.style.display = "none";
             problemsSolved.style.display = "none";
             difficultyContainer.style.display = "none";
+              streak.style.display = "none";
         }
     };
 
