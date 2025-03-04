@@ -628,14 +628,15 @@ body {
   font-weight: 550;
   color: var(--white);
   border-radius: 8px;
+  margin-top: 10px;
   display: inline-block;
 }
 
 .difficulty-container {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 20px;
+  margin-top: 12px;
 }
 
 .difficulty-btn {
@@ -959,28 +960,43 @@ select.form-control {
   margin-top: 3rem; /* Adjusted for better flow */
 }
 
-
-.streak-container {
-  width: 10%;
+#badges-grid {
+  width: 100%;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin-top: 20px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95));
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 0 10px rgba(255, 255, 255, 0.05);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
 }
-
-.streak-header h2 {
-  color: var(--white);
-  font-size: 20px;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  letter-spacing: 1px;
-  margin-bottom: 15px;
+.status-card{
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95));
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 0 10px rgba(255, 255, 255, 0.05);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+.streak-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 15px;
+  /* margin-top: 1rem; */
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .streak-counter {
@@ -990,22 +1006,169 @@ select.form-control {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
+  padding-left: 2rem;
+  margin-bottom: 10px;
 }
 
 .streak-circle {
   position: absolute;
-  width: 10%;
-  height: 10%;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  justify-content: center;
 }
 
 .streak-number {
   position: relative;
   color: white;
-  font-size: 2px;
+  font-size: 12px;
+  margin-top: 8px;
   font-weight: 200;
   z-index: 1;
+}
+.streak-info {
+  flex: 1;
+}
+
+.streak-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  margin-left: 2rem;
+}
+
+.streak-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: 2rem;
+  position: relative;
+}
+
+.streak-progress {
+  height: 100%;
+  width: 70%;
+  background: linear-gradient(to right, #8b5cf6, #ec4899);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.streak-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Badges Grid Modern Styling */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 5px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.badge-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  color: white;
+  font-size: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.badge-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: rotate(30deg);
+  transition: all 0.5s ease;
+  left: -100%;
+}
+
+.badge:hover .badge-icon::before {
+  left: 100%;
+}
+
+.badge.locked .badge-icon {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.badge-name {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge:hover {
+  transform: translateY(-2px);
+}
+y
+/* Headers */
+.status-card h2 {
+  font-size: 10px;
+  color: white;
+  margin-bottom: 10px;
+  font-weight: 500;
+  background: linear-gradient(to right, #ffffff, #a1a1aa);
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

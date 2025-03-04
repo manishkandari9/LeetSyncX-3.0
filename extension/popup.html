@@ -61,22 +61,48 @@
                 <button id="hardBtn" class="difficulty-btn hard">Hard: 0</button>
             </div>  
 
-            <div class="streak-container" id="streak">
-              <div class="streak-header">
-                  <h2>LeetCode Streak</h2>
-              </div>
-              <div class="streak-counter">
+            <div class="status-card" id="status-card">
+              <div class="streak-container">
+                <div class="streak-counter">
                   <div class="streak-circle"></div>
                   <div class="streak-number">Day 7</div>
+                </div>
+                <div class="streak-info">
+                  <div class="streak-label">Keep going! You're on fire!</div>
+                  <div class="streak-bar">
+                    <div class="streak-progress"></div>
+                  </div>
+                </div>
               </div>
-          </div>
-
+            </div>
+          
+            <div class="status-card" id="badges-grid">
+              <h2>Achievement Badges</h2>
+              <div class="badges-grid" id="">
+                <div class="badge">
+                  <div class="badge-icon">🏆</div>
+                  <div class="badge-name">First Win</div>
+                </div>
+                <div class="badge">
+                  <div class="badge-icon">⚡</div>
+                  <div class="badge-name">Speed Demon</div>
+                </div>
+                <div class="badge">
+                  <div class="badge-icon">🧠</div>
+                  <div class="badge-name">Problem Solver</div>
+                </div>
+                <div class="badge locked">
+                  <div class="badge-icon">🔍</div>
+                  <div class="badge-name">Bug Hunter</div>
+                </div>
+              </div>
+            </div>
         
             
-            <div class="status">
+            <!-- <div class="status">
               <span class="icon spin" id="spinnerIcon"></span>
               <span id="status">Waiting for action...</span>
-            </div>
+            </div> -->
             
             <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p>
         <div class="infoo">
