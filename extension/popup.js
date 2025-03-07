@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return streak;
     };
 
-    const leetSyncUpdateUI = async (token, repo) => {
+    const leetsyncXUpdateUI = async (token, repo) => {
         if (token) {
             loginButton.style.display = "none";
             loginDescription.style.display = "none";
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initial UI load
     const result = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
-    leetSyncUpdateUI(result.githubAccessToken, result.selectedRepo);
+    leetsyncXUpdateUI(result.githubAccessToken, result.selectedRepo);
 
     // Listen for difficulty stats aur streak updates from content.js
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const data = response.data;
                     if (data.success && data.access_token) {
                         chrome.storage.sync.set({ githubAccessToken: data.access_token }, () => {
-                            leetSyncUpdateUI(data.access_token, null);
+                            leetsyncXUpdateUI(data.access_token, null);
                         });
                     }
                 } catch (error) {
@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let selectedRepo = null;
 
-        const leetSyncFetchRepos = async (page = 1, perPage = 100) => {
+        const leetsyncXFetchRepos = async (page = 1, perPage = 100) => {
             const response = await axios.get("https://api.github.com/user/repos", {
                 headers: {
                     Authorization: `Bearer ${token.githubAccessToken}`,
@@ -244,9 +244,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             return response.data;
         };
 
-        const leetSyncRenderRepos = async () => {
+        const leetsyncXRenderRepos = async () => {
             repoGrid.innerHTML = "";
-            const repos = await leetSyncFetchRepos();
+            const repos = await leetsyncXFetchRepos();
             repos.forEach(repo => {
                 const repoCard = document.createElement("div");
                 repoCard.className = "repo-card";
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
 
         try {
-            await leetSyncRenderRepos();
+            await leetsyncXRenderRepos();
             modal.style.display = "flex";
             syncMessage.textContent = "Please select a repository.";
 
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             confirmRepoBtn.addEventListener("click", () => {
                 if (selectedRepo) {
                     chrome.storage.sync.set({ selectedRepo }, () => {
-                        leetSyncUpdateUI(token.githubAccessToken, selectedRepo);
+                        leetsyncXUpdateUI(token.githubAccessToken, selectedRepo);
                         modal.style.display = "none";
                     });
                 }
@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     const newRepoFullName = response.data.full_name;
                     chrome.storage.sync.set({ selectedRepo: newRepoFullName }, () => {
-                        leetSyncUpdateUI(token.githubAccessToken, newRepoFullName);
+                        leetsyncXUpdateUI(token.githubAccessToken, newRepoFullName);
                         modal.style.display = "none";
                     });
                 } catch (error) {
@@ -359,9 +359,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     logoutButton?.addEventListener("click", () => {
         chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
-            // chrome.storage.local.remove(["difficultyStats", "streakDates"], () => { 
-                leetSyncUpdateUI(null, null);
-            // });
+            leetsyncXUpdateUI(null, null);
         });
     });
 });

@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "LeetCode to GitHub",
+    "name": "LeetSyncX",
     "version": "1.1",
     "description": "Automatically push LeetCode solutions to GitHub",
     "permissions": [

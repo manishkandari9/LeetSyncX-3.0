@@ -63,17 +63,17 @@ function padNumber(slug) {
 }
 
 function getPerformanceStats(runtime, runtimeRank, memory, memoryRank) {
-    return `Runtime: ${runtime} (${runtimeRank}%), Memory: ${memory} (${memoryRank}%) - LeetSync`;
+    return `Runtime: ${runtime} (${runtimeRank}%), Memory: ${memory} (${memoryRank}%) - LeetsyncX`;
 }
 
-function LeetSync() {
+function LeetsyncX() {
     this.solutionDetails = null;
-    this.spinnerId = 'leetsync_spinner';
-    this.spinnerClass = 'leetsync_spinner_style';
+    this.spinnerId = 'leetsyncx_spinner';
+    this.spinnerClass = 'leetsyncx_spinner_style';
     this.addLoadingSpinner();
 }
 
-LeetSync.prototype.fetchSolutionDetails = async function () {
+LeetsyncX.prototype.fetchSolutionDetails = async function () {
     const problemSlug = document.URL.match(/leetcode.com\/problems\/([^\/]*)\//)?.[1];
     const storedData = await chrome.storage.local.get(problemSlug);
     if (!storedData[problemSlug]) {
@@ -112,15 +112,15 @@ LeetSync.prototype.fetchSolutionDetails = async function () {
     }
 };
 
-LeetSync.prototype.extractCode = function () {
+LeetsyncX.prototype.extractCode = function () {
     return this.solutionDetails ? this.solutionDetails.code : null;
 };
 
-LeetSync.prototype.detectLanguage = function () {
+LeetsyncX.prototype.detectLanguage = function () {
     return this.solutionDetails ? supportedLanguages[this.solutionDetails.lang.verboseName] : null;
 };
 
-LeetSync.prototype.buildFileName = function () {
+LeetsyncX.prototype.buildFileName = function () {
     let problemId = this.solutionDetails?.question?.questionId;
     let problemSlug = this.solutionDetails?.question?.titleSlug;
 
@@ -138,7 +138,7 @@ LeetSync.prototype.buildFileName = function () {
     return fileName;
 };
 
-LeetSync.prototype.checkSubmissionSuccess = function () {
+LeetsyncX.prototype.checkSubmissionSuccess = function () {
     const resultTags = document.querySelectorAll('[data-e2e-locator="submission-result"]');
     if (hasElements(resultTags)) {
         resultTags[0].classList.add('sync_success');
@@ -147,7 +147,7 @@ LeetSync.prototype.checkSubmissionSuccess = function () {
     return false;
 };
 
-LeetSync.prototype.getSolutionStats = function () {
+LeetsyncX.prototype.getSolutionStats = function () {
     if (this.solutionDetails) {
         const runtimeVal = this.solutionDetails.runtimeDisplay || "N/A";
         const runtimePercent = this.solutionDetails.runtimePercentile != null 
@@ -159,20 +159,20 @@ LeetSync.prototype.getSolutionStats = function () {
             : "N/A";
         return getPerformanceStats(runtimeVal, runtimePercent, memoryVal, memoryPercent);
     }
-    return "Performance stats unavailable - LeetSync";
+    return "Performance stats unavailable - LeetsyncX";
 };
 
-LeetSync.prototype.addLoadingSpinner = function () {
+LeetsyncX.prototype.addLoadingSpinner = function () {
     const styleTag = document.createElement('style');
     styleTag.textContent = `.${this.spinnerClass} { width: 1.5em; height: 1.5em; border: 0.3em solid #ddd; border-top: 0.3em solid #ff6c0a; border-radius: 50%; animation: spin 0.8s linear infinite; } @keyframes spin { 100% { transform: rotate(360deg); } }`;
     document.head.appendChild(styleTag);
 };
 
-LeetSync.prototype.showSpinner = function () {
-    let spinnerContainer = document.getElementById('leetsync_spinner_container');
+LeetsyncX.prototype.showSpinner = function () {
+    let spinnerContainer = document.getElementById('leetsyncx_spinner_container');
     if (!spinnerContainer) {
         spinnerContainer = document.createElement('span');
-        spinnerContainer.id = 'leetsync_spinner_container';
+        spinnerContainer.id = 'leetsyncx_spinner_container';
         spinnerContainer.style = 'margin-right: 15px; padding-top: 3px;';
     }
     spinnerContainer.innerHTML = `<div id="${this.spinnerId}" class="${this.spinnerClass}"></div>`;
@@ -180,14 +180,14 @@ LeetSync.prototype.showSpinner = function () {
     isSyncing = true;
 };
 
-LeetSync.prototype.placeSpinner = function (container) {
+LeetsyncX.prototype.placeSpinner = function (container) {
     const targetArea = document.getElementsByClassName('ml-auto')[0];
     if (targetArea && targetArea.childNodes.length > 0) {
         targetArea.prepend(container);
     }
 };
 
-LeetSync.prototype.showSuccess = function () {
+LeetsyncX.prototype.showSuccess = function () {
     const spinner = document.getElementById(this.spinnerId);
     if (spinner) {
         spinner.className = '';
@@ -195,7 +195,7 @@ LeetSync.prototype.showSuccess = function () {
     }
 };
 
-LeetSync.prototype.showFailure = function () {
+LeetsyncX.prototype.showFailure = function () {
     const spinner = document.getElementById(this.spinnerId);
     if (spinner) {
         spinner.className = '';
@@ -203,7 +203,7 @@ LeetSync.prototype.showFailure = function () {
     }
 };
 
-LeetSync.prototype.trackSubmissionNavigation = function () {
+LeetsyncX.prototype.trackSubmissionNavigation = function () {
     window.navigation.addEventListener('navigate', event => {
         const problemMatch = window.location.href.match(/leetcode.com\/problems\/(.*)\/submissions/);
         const submissionMatch = window.location.href.match(/\/(\d+)(\/|\?|$)/);
@@ -250,7 +250,7 @@ const syncSolution = (syncHandler, suffix) => {
 
             chrome.runtime.sendMessage(syncPayload, (response) => {
                 if (response.status === "success") {
-                    console.log("LeetSync synced solution to GitHub:", response.message);
+                    console.log("LeetsyncX synced solution to GitHub:", response.message);
                     isSyncing = false;
                     syncHandler.showSuccess();
 
@@ -269,20 +269,18 @@ const syncSolution = (syncHandler, suffix) => {
                                 streakDates.sort(); // Dates ko order mein rakho
                             }
 
-
-
-                       // Storage mein save karo aur popup.js ko bhejo
-                       chrome.storage.local.set({difficultyStats: stats,streakDates: streakDates }, () => {
-                            chrome.runtime.sendMessage({
-                                action: "updateDifficultyStats",
-                                difficultyStats: stats,
-                                streakDates: streakDates // Streak ke dates bhi bhej do
+                           // Storage mein save karo aur popup.js ko bhejo
+                           chrome.storage.local.set({difficultyStats: stats, streakDates: streakDates }, () => {
+                                chrome.runtime.sendMessage({
+                                    action: "updateDifficultyStats",
+                                    difficultyStats: stats,
+                                    streakDates: streakDates // Streak ke dates bhi bhej do
+                                });
                             });
                         });
                     });
-                });
                 } else {
-                    console.error("LeetSync sync failed:", response.message);
+                    console.error("LeetsyncX sync failed:", response.message);
                     isSyncing = false;
                     syncHandler.showFailure();
                 }
@@ -292,7 +290,7 @@ const syncSolution = (syncHandler, suffix) => {
             isSyncing = false;
             syncHandler.showFailure();
             clearInterval(syncInterval);
-            console.error("LeetSync error:", error);
+            console.error("LeetsyncX error:", error);
         }
     }, 1000);
 };
@@ -305,7 +303,7 @@ const watchSubmit = new MutationObserver((_, observerInstance) => {
 
     if (submitBtn && activeTextArea) {
         observerInstance.disconnect();
-        const syncHandler = new LeetSync();
+        const syncHandler = new LeetsyncX();
         submitBtn.addEventListener('click', () => syncSolution(syncHandler));
     }
 });
@@ -315,6 +313,6 @@ setTimeout(() => {
 }, 2000);
 
 setTimeout(() => {
-    const syncHandler = new LeetSync();
+    const syncHandler = new LeetsyncX();
     syncHandler.trackSubmissionNavigation();
 }, 6000);

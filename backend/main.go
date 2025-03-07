@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
 var (
 	githubClientID     string
 	githubClientSecret string
@@ -96,7 +97,7 @@ func pushToGitHub(accessToken, repo, fileName, content string) error {
 	}
 
 	fileData := map[string]string{
-		"message": " Auto-sync LeetCode solution: " + fileName,
+		"message": " Auto-sync LeetsyncX solution: " + fileName,
 		"content": encodedContent,
 	}
 	if sha != "" {
