@@ -13,17 +13,106 @@ document.addEventListener("DOMContentLoaded", async () => {
     const hardBtn = document.getElementById("hardBtn");
     const modal = document.getElementById("repoContainer");
     const statuscard = document.getElementById("status-card");
-    const badgesgrid =document.getElementById("badges-grid")
+    const badgesgrid = document.getElementById("badges-grid");
+
+    // Create difficulty count spans
+    const easyCount = document.createElement('span');
+    const mediumCount = document.createElement('span');
+    const hardCount = document.createElement('span');
+
+    easyCount.id = 'easyCount';
+    mediumCount.id = 'mediumCount';
+    hardCount.id = 'hardCount';
+
+    // Set initial button text and append spans once
+    easyBtn.textContent = "Easy: ";
+    mediumBtn.textContent = "Medium: ";
+    hardBtn.textContent = "Hard: ";
+    easyBtn.appendChild(easyCount);
+    mediumBtn.appendChild(mediumCount);
+    hardBtn.appendChild(hardCount);
+
+    // Streak ke liye naya element fetch karo
+    const streakInfo = document.querySelector(".streak-info");
+    // const streakLabel = document.querySelector(".streak-label");
+    const streakProgress = document.querySelector(".streak-progress");
+    const streakNumber = document.querySelector(".streak-number");
 
     if (modal) {
         modal.style.display = "none";
+    }
+
+    if (streakInfo) {
+        streakInfo.style.display = "none"; // Initially hide streak section
     }
 
     const GITHUB_CLIENT_ID = "Ov23lifxi8XMbqm0Zdsa";
     const REDIRECT_URI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org";
     const BACKEND_URL = "http://localhost:8080";
 
-    const leetSyncUpdateUI = (token, repo) => {
+    // Tumhara original difficulty display function, unchanged
+    const updateDifficultyDisplay = (stats) => {
+        const easy = stats.Easy || 0;
+        const medium = stats.Medium || 0;
+        const hard = stats.Hard || 0;
+        const total = easy + medium + hard;
+
+        // Only update the spans, not the button text
+        easyCount.textContent = easy;
+        mediumCount.textContent = medium;
+        hardCount.textContent = hard;
+        problemsSolved.textContent = `Problems Solved: ${total}`;
+    };
+
+    // Naya streak update function alag se
+    // Yeh streak ko calculate aur display karega
+    const updateStreakDisplay = (streakDates) => {
+        if (!streakDates || streakDates.length === 0) {
+            if (streakInfo) streakInfo.style.display = "none";
+            return 0;
+        }
+
+        const sortedDates = [...streakDates].sort(); // Dates ko sort karo
+        let streak = 1;
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        let currentDate = new Date(sortedDates[sortedDates.length - 1]); // Latest date
+        const todayStr = today.toISOString().split('T')[0];
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const lastDateStr = currentDate.toISOString().split('T')[0];
+
+        // Agar last date aaj ya kal nahi hai, streak toot gaya
+        if (lastDateStr !== todayStr && lastDateStr !== yesterdayStr) {
+            if (streakInfo) streakInfo.style.display = "none";
+            return 0;
+        }
+
+        // Streak calculate karo
+        for (let i = sortedDates.length - 2; i >= 0; i--) {
+            const prevDate = new Date(sortedDates[i]);
+            const diffDays = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+            if (diffDays === 1) {
+                streak++;
+                currentDate = prevDate;
+            } else {
+                break;
+            }
+        }
+
+        // Streak UI update karo
+        if (streakInfo) {
+            streakInfo.style.display = "block";
+            streakNumber.textContent = `${streak}`;
+            // streakLabel.textContent = `Keep going! You're on a ${streak}-day streak!`;
+            streakProgress.style.width = `${Math.min(streak * 10, 100)}%`; // Progress bar 10% per day, max 100%
+        }
+
+        return streak;
+    };
+
+    const leetSyncUpdateUI = async (token, repo) => {
         if (token) {
             loginButton.style.display = "none";
             loginDescription.style.display = "none";
@@ -41,6 +130,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 hardBtn.style.display = "inline-block";
                 statuscard.style.display = "block";
                 badgesgrid.style.display = "block";
+
+                // Fetch initial difficulty stats aur streak dates se storage
+                chrome.storage.local.get(["difficultyStats", "streakDates"], (result) => {
+                    const stats = result.difficultyStats || { Easy: 0, Medium: 0, Hard: 0 };
+                    const streakDates = result.streakDates || [];
+                    updateDifficultyDisplay(stats); // Tumhara original function
+                    updateStreakDisplay(streakDates); // Naya streak function
+                });
             } else {
                 setupHookButton.style.display = "block";
                 setupHookDescription.style.display = "block";
@@ -50,6 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 difficultyContainer.style.display = "none";
                 statuscard.style.display = "none";
                 badgesgrid.style.display = "none";
+                if (streakInfo) streakInfo.style.display = "none"; // Streak hide karo
             }
         } else {
             loginButton.style.display = "block";
@@ -63,11 +161,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             difficultyContainer.style.display = "none";
             statuscard.style.display = "none";
             badgesgrid.style.display = "none";
+            if (streakInfo) streakInfo.style.display = "none"; // Streak hide karo
         }
     };
 
+    // Initial UI load
     const result = await chrome.storage.sync.get(["githubAccessToken", "selectedRepo"]);
     leetSyncUpdateUI(result.githubAccessToken, result.selectedRepo);
+
+    // Listen for difficulty stats aur streak updates from content.js
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === "updateDifficultyStats") {
+            updateDifficultyDisplay(message.difficultyStats); // Tumhara original function
+            updateStreakDisplay(message.streakDates); // Naya streak function
+        }
+    });
 
     loginButton?.addEventListener("click", () => {
         syncMessage.textContent = "Redirecting to GitHub...";
@@ -117,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cancelNewRepo = document.getElementById("cancelNewRepo");
         const searchBar = document.querySelector(".search-bar");
         const repoheader = document.getElementById("repoheader");
-        
+
         let selectedRepo = null;
 
         const leetSyncFetchRepos = async (page = 1, perPage = 100) => {
@@ -251,7 +359,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     logoutButton?.addEventListener("click", () => {
         chrome.storage.sync.remove(["githubAccessToken", "selectedRepo"], () => {
-            leetSyncUpdateUI(null, null);
+            // chrome.storage.local.remove(["difficultyStats", "streakDates"], () => { 
+                leetSyncUpdateUI(null, null);
+            // });
         });
     });
-})
+});

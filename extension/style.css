@@ -1026,7 +1026,7 @@ select.form-control {
 .streak-number {
   position: relative;
   color: white;
-  font-size: 12px;
+  font-size: 20px;
   margin-top: 8px;
   font-weight: 200;
   z-index: 1;
@@ -1172,3 +1172,4 @@ y
     background-position: 200% 0;
   }
 }
+

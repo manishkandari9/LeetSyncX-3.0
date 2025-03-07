@@ -253,6 +253,34 @@ const syncSolution = (syncHandler, suffix) => {
                     console.log("LeetSync synced solution to GitHub:", response.message);
                     isSyncing = false;
                     syncHandler.showSuccess();
+
+                    // Update difficulty stats
+                    const difficulty = syncHandler.solutionDetails?.question?.difficulty || "Unknown";
+                    chrome.storage.local.get("difficultyStats", (result) => {
+                        let stats = result.difficultyStats || { Easy: 0, Medium: 0, Hard: 0 };
+                        stats[difficulty] = (stats[difficulty] || 0) + 1;
+
+                        // Streak ke liye dates update karo
+                        const today = new Date().toISOString().split('T')[0]; // Aaj ka date "YYYY-MM-DD" format mein
+                        chrome.storage.local.get("streakDates", (streakResult) => {
+                            let streakDates = streakResult.streakDates || [];
+                            if (!streakDates.includes(today)) { // Agar aaj ka date nahi hai toh add karo
+                                streakDates.push(today);
+                                streakDates.sort(); // Dates ko order mein rakho
+                            }
+
+
+
+                       // Storage mein save karo aur popup.js ko bhejo
+                       chrome.storage.local.set({difficultyStats: stats,streakDates: streakDates }, () => {
+                            chrome.runtime.sendMessage({
+                                action: "updateDifficultyStats",
+                                difficultyStats: stats,
+                                streakDates: streakDates // Streak ke dates bhi bhej do
+                            });
+                        });
+                    });
+                });
                 } else {
                     console.error("LeetSync sync failed:", response.message);
                     isSyncing = false;
