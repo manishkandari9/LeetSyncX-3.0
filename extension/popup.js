@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const GITHUB_CLIENT_ID = "Ov23lifxi8XMbqm0Zdsa";
     const REDIRECT_URI = "https://emppmgemkbjiojiblefmidpoichmbggg.chromiumapp.org";
-    const BACKEND_URL = "https://leetsyncx-3-0-1.onrender.com";
+    const BACKEND_URL = "http://localhost:8080";
 
 
     // Tumhara original difficulty display function, unchanged

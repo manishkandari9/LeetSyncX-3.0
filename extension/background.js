@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://leetsyncx-3-0-1.onrender.com/save";   // Go backend URL
+const BACKEND_URL = "http://localhost:8080/save";   // Go backend URL
 
 function pushToBackend(accessToken, repo, filename, content) {
     return fetch(BACKEND_URL, {
