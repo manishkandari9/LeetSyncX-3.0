@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Yeh streak ko calculate aur display karega
     const updateStreakDisplay = (streakDates) => {
         if (!streakDates || streakDates.length === 0) {
-            if (streakInfo) streakInfo.style.display = "none";
+            if (streakInfo) streakInfo.style.display = "block";
             return 0;
         }
 
@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (streakInfo) {
             streakInfo.style.display = "block";
             streakNumber.textContent = `${streak}`;
-            // streakLabel.textContent = `Keep going! You're on a ${streak}-day streak!`;
             streakProgress.style.width = `${Math.min(streak * 10, 100)}%`; // Progress bar 10% per day, max 100%
         }
 
