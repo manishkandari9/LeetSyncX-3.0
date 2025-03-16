@@ -69,7 +69,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Yeh streak ko calculate aur display karega
     const updateStreakDisplay = (streakDates) => {
         if (!streakDates || streakDates.length === 0) {
-            if (streakInfo) streakInfo.style.display = "block";
+            if (streakInfo) {
+                streakInfo.style.display = "block";
+                streakNumber.textContent = "0";  
+                streakProgress.style.width = "0%"; 
+            }
             return 0;
         }
 
