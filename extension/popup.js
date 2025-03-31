@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Agar last date aaj ya kal nahi hai, streak toot gaya
         if (lastDateStr !== todayStr && lastDateStr !== yesterdayStr) {
-            if (streakInfo) streakInfo.style.display = "none";
+            if (streakInfo) streakInfo.style.display = "";
             return 0;
         }
 
