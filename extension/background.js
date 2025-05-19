@@ -1,65 +1,106 @@
-const BACKEND_URL = "http://localhost:8080/save";   // Go backend URL
-
-function pushToBackend(accessToken, repo, filename, content) {
-    return fetch(BACKEND_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            access_token: accessToken,
-            repo: repo,
-            filename: filename,
-            content: content,
-        }),
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(error => {
-                throw new Error(error.error || "Backend request failed");
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("✅ Backend Response:", data); // Important success log
-        return { status: "success", message: data.message || "Solution saved to GitHub" };
-    })
-    .catch(error => {
-        console.error("❌ Error pushing to backend:", error); // Important error log
-        return { status: "error", message: `Failed to save solution: ${error.message}` };
-    });
-}
-
+// background.js
+// Handle messages from content.js to push solutions to GitHub
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action !== "push_solution") {
-        sendResponse({ status: "error", message: "Invalid action" });
-        return true;
+  if (message.action !== "push_solution") {
+    sendResponse({ status: "error", message: "Invalid action" });
+    return true;
+  }
+
+  const { title, code, language } = message.solution;
+  if (!title || !code || !language) {
+    sendResponse({ status: "error", message: "Incomplete solution data" });
+    return true;
+  }
+
+  chrome.storage.sync.get(["githubAccessToken", "selectedRepo"], async (result) => {
+    if (chrome.runtime.lastError) {
+      console.error("Storage error:", chrome.runtime.lastError.message);
+      sendResponse({ status: "error", message: "Failed to access storage" });
+      return;
     }
 
-    const { title, code, language } = message.solution;
-    if (!title || !code || !language) {
-        sendResponse({ status: "error", message: "Incomplete solution data" });
-        return true;
+    const { githubAccessToken, selectedRepo } = result;
+    if (!githubAccessToken || !selectedRepo) {
+      sendResponse({
+        status: "error",
+        message: "Not authenticated or repo not selected",
+      });
+      return;
     }
 
-    chrome.storage.sync.get(["githubAccessToken", "selectedRepo"], async (result) => {
-        if (chrome.runtime.lastError) {
-            console.error("Storage error:", chrome.runtime.lastError.message);
-            sendResponse({ status: "error", message: "Failed to access storage" });
-            return;
-        }
+    const filename = `${title}${language}`;
+    try {
+      // Push to GitHub directly
+      const response = await pushToGitHub(
+        githubAccessToken,
+        selectedRepo,
+        filename,
+        code
+      );
+      sendResponse(response);
+    } catch (error) {
+      console.error("❌ Error pushing to GitHub:", error);
+      sendResponse({
+        status: "error",
+        message: `Failed to save solution: ${error.message}`,
+      });
+    }
+  });
 
-        const { githubAccessToken, selectedRepo } = result;
-        if (!githubAccessToken || !selectedRepo) {
-            sendResponse({ status: "error", message: "Not authenticated or repo not selected" });
-            return;
-        }
-
-        const filename = `${title}${language}`;
-        const response = await pushToBackend(githubAccessToken, selectedRepo, filename, code);
-        sendResponse(response);
-    });
-
-    return true; 
+  return true; // Keep the message channel open for async response
 });
+
+// Function to push file to GitHub
+async function pushToGitHub(accessToken, repo, fileName, content) {
+  const url = `https://api.github.com/repos/${repo}/contents/${fileName}`;
+  const encodedContent = btoa(unescape(encodeURIComponent(content))); // Base64 encode
+
+  // Check if file exists to get SHA
+  let sha = "";
+  try {
+    const getResponse = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    });
+    if (getResponse.status === 200) {
+      const fileData = await getResponse.json();
+      sha = fileData.sha;
+    }
+  } catch (error) {
+    // File doesn't exist, proceed without SHA
+  }
+
+  // Prepare request body
+  const requestBody = {
+    message: `Auto-sync LeetsyncX solution: ${fileName}`,
+    content: encodedContent,
+  };
+  if (sha) {
+    requestBody.sha = sha;
+  }
+
+  // Push file to GitHub
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/vnd.github.v3+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "GitHub API request failed");
+  }
+
+  console.log("✅ Successfully pushed to GitHub:", fileName);
+  return {
+    status: "success",
+    message: "Solution saved to GitHub",
+  };
+}
