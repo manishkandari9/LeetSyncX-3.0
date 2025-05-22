@@ -1,5 +1,4 @@
 // background.js
-// Handle messages from content.js to push solutions to GitHub
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action !== "push_solution") {
     sendResponse({ status: "error", message: "Invalid action" });
@@ -21,41 +20,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     const { githubAccessToken, selectedRepo } = result;
     if (!githubAccessToken || !selectedRepo) {
-      sendResponse({
-        status: "error",
-        message: "Not authenticated or repo not selected",
-      });
+      sendResponse({ status: "error", message: "Not authenticated or repo not selected" });
       return;
     }
 
     const filename = `${title}${language}`;
     try {
-      // Push to GitHub directly
-      const response = await pushToGitHub(
-        githubAccessToken,
-        selectedRepo,
-        filename,
-        code
-      );
+      const response = await pushToGitHub(githubAccessToken, selectedRepo, filename, code);
       sendResponse(response);
     } catch (error) {
-      console.error("❌ Error pushing to GitHub:", error);
-      sendResponse({
-        status: "error",
-        message: `Failed to save solution: ${error.message}`,
-      });
+      console.error("Error pushing to GitHub:", error);
+      sendResponse({ status: "error", message: `Failed to save solution: ${error.message}` });
     }
   });
 
   return true; // Keep the message channel open for async response
 });
 
-// Function to push file to GitHub
 async function pushToGitHub(accessToken, repo, fileName, content) {
-  const url = `https://api.github.com/repos/${repo}/contents/${fileName}`;
+  const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(fileName)}`;
   const encodedContent = btoa(unescape(encodeURIComponent(content))); // Base64 encode
 
-  // Check if file exists to get SHA
   let sha = "";
   try {
     const getResponse = await fetch(url, {
@@ -68,21 +53,19 @@ async function pushToGitHub(accessToken, repo, fileName, content) {
     if (getResponse.status === 200) {
       const fileData = await getResponse.json();
       sha = fileData.sha;
+    } else if (getResponse.status !== 404) {
+      throw new Error(`GitHub API error: ${getResponse.status}`);
     }
   } catch (error) {
-    // File doesn't exist, proceed without SHA
+    console.warn("File does not exist, proceeding without SHA:", error);
   }
 
-  // Prepare request body
   const requestBody = {
     message: `Auto-sync LeetsyncX solution: ${fileName}`,
     content: encodedContent,
   };
-  if (sha) {
-    requestBody.sha = sha;
-  }
+  if (sha) requestBody.sha = sha;
 
-  // Push file to GitHub
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -95,12 +78,9 @@ async function pushToGitHub(accessToken, repo, fileName, content) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "GitHub API request failed");
+    throw new Error(errorData.message || `GitHub API request failed: ${response.status}`);
   }
 
-  console.log("✅ Successfully pushed to GitHub:", fileName);
-  return {
-    status: "success",
-    message: "Solution saved to GitHub",
-  };
+  console.log("Successfully pushed to GitHub:", fileName);
+  return { status: "success", message: "Solution saved to GitHub" };
 }

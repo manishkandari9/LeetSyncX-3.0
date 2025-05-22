@@ -1,35 +1,50 @@
 {
-    "manifest_version": 3,
-    "name": "LeetSyncX",
-    "version": "1.1",
-    "description": "Automatically push LeetCode solutions to GitHub",
-    "permissions": [
-        "storage", "activeTab", "identity", "notifications", "scripting"
-    ],
-    "host_permissions": [
-        "https://leetcode.com/*",
-        "https://api.github.com/*",
-        "https://github.com/*"
-    ],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "icon.png",
-            "48": "icon.png",
-            "128": "icon.png"
-        }
-    },
-    "content_scripts": [
-        {
-          "matches": ["*://leetcode.com/problems/*"],
-            "js": ["content.js", "axios.min.js"],
-            "run_at": "document_idle"
-        }
-    ],
-    "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'none';"
+  "manifest_version": 3,
+  "name": "LeetSyncX",
+  "version": "1.1",
+  "description": "Automatically push LeetCode solutions to GitHub",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "identity",
+    "notifications",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://api.github.com/*",
+    "https://github.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
     }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://leetcode.com/problems/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icon.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
