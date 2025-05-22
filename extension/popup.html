@@ -28,83 +28,77 @@
             Set up Hook
         </button>
         <button
-        id="logoutButton"
-        class="absolute top-4 right-4 p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition-all shadow-md"
-        style="display: none;"
-        aria-label="Logout"
-    >
-        <span class="logicon" id="logoutIcon">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"  
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide-logout"
-            >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" x2="9" y1="12" y2="12"/>
-            </svg>
-        </span>
-    </button>
+            id="logoutButton"
+            class="absolute top-4 right-4 p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition-all shadow-md"
+            style="display: none;"
+            aria-label="Logout"
+        >
+            <span class="logicon" id="logoutIcon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"  
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide-logout"
+                >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" x2="9" y1="12" y2="12"/>
+                </svg>
+            </span>
+        </button>
 
-            <p id="syncMessage" style="display: none;">Waiting for action...</p>
-            <p id="problemsSolved">Problems Solved: 0</p>
-            <div  class="difficulty-container">
-                <button id="easyBtn" class="difficulty-btn easy">Easy: </button>
-                <button id="mediumBtn" class="difficulty-btn medium">Medium: </button>
-                <button id="hardBtn" class="difficulty-btn hard">Hard: </button>
-            </div>  
+        <p id="syncMessage" style="display: none;">Waiting for action...</p>
+        <p id="problemsSolved">Problems Solved: 0</p>
+        <div class="difficulty-container">
+            <button id="easyBtn" class="difficulty-btn easy">Easy: </button>
+            <button id="mediumBtn" class="difficulty-btn medium">Medium: </button>
+            <button id="hardBtn" class="difficulty-btn hard">Hard: </button>
+        </div>  
 
-            <div class="status-card" id="status-card">
-              <div class="streak-container">
+        <div class="status-card" id="status-card">
+            <div class="streak-container">
                 <div class="streak-counter">
-                  <div class="streak-circle"></div>
-                  <div class="streak-number">0</div>
+                    <div class="streak-circle"></div>
+                    <div class="streak-number">0</div>
                 </div>
                 <div class="streak-info">
-                  <div class="streak-label">Keep going! You're on fire!</div>
-                  <div class="streak-bar">
-                    <div class="streak-progress"></div>
-                  </div>
+                    <div class="streak-label">Keep going! You're on fire!</div>
+                    <div class="streak-bar">
+                        <div class="streak-progress"></div>
+                    </div>
                 </div>
-              </div>
             </div>
+        </div>
           
-            <div class="status-card" id="badges-grid">
-              <h2>Achievement Badges</h2>
-              <div class="badges-grid" id="">
+        <div class="status-card" id="badges-grid">
+            <h2>Achievement Badges</h2>
+            <div class="badges-grid" id="">
                 <div class="badge">
-                  <div class="badge-icon"></div>
-                  <div class="badge-name">First Win</div>
+                    <div class="badge-icon"></div>
+                    <div class="badge-name">First Win</div>
                 </div>
                 <div class="badge">
-                  <div class="badge-icon"></div>
-                  <div class="badge-name">Speed Demon</div>
+                    <div class="badge-icon"></div>
+                    <div class="badge-name">Speed Demon</div>
                 </div>
                 <div class="badge">
-                  <div class="badge-icon"></div>
-                  <div class="badge-name">Problem Solver</div>
+                    <div class="badge-icon"></div>
+                    <div class="badge-name">Problem Solver</div>
                 </div>
                 <div class="badge">
-                  <div class="badge-icon"></div>
-                  <div class="badge-name">Bug Hunter</div>
+                    <div class="badge-icon"></div>
+                    <div class="badge-name">Bug Hunter</div>
                 </div>
-              </div>
             </div>
+        </div>
         
-            
-            <!-- <div class="status">
-              <span class="icon spin" id="spinnerIcon"></span>
-              <span id="status">Waiting for action...</span>
-            </div> -->
-            
-            <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p>
+        <p id="featureRequest"><strong>Want more features?</strong> Request a feature!</p>
         <div class="infoo">
             <div class="icon-container">
                 <a href="https://github.com" target="_blank"><span class="iconn" id="githubSocialIcon"></span></a>
@@ -122,43 +116,40 @@
                 <div class="search-bar">
                     <input type="text" id="repoSearch" placeholder="Search repositories...">
                 </div>
-                <div class="repo-creation-container">
-                    <button id="createRepoBtn" class=" btn create-repo-btn">
-                      <!-- <span class="btn-icon">+</span> -->
-                      <span class="btn-text">Create New Repo</span>
-                    </button>
-                    
-                    <div id="createRepoForm" class="create-repo-form">
-                      <div class="form-header">
-                        <p>A repository contains all project files and revision history</p>
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="newRepoName">Repository name</label>
-                        <input 
-                          type="text" 
-                          id="newRepoName" 
-                          placeholder="Leet-sync-1000" 
-                          class="form-control"
-                        />
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="repoVisibility">Visibility</label>
-                        <select id="repoVisibility" class="form-control">
-                          <option value="public">Public</option>
-                          <option value="private">Private</option>
-                        </select>
-                      </div>
-                      
-                      <div class="form-actions">
-                        <button id="cancelNewRepo" class="btn btn-cancel">Cancel</button>
-                        <button id="submitNewRepo" class="btn btn-create">Create repo</button>
-                      </div>
-                    </div>
-                  </div>
                 <div id="repoGrid"></div>
-                <button id="confirmRepo" disabled>Confirm Selection</button>
+                <div class="button-container">
+                    <button id="createRepoBtn" class="btn create-repo-btn">
+                        <span class="btn-text">New Repo</span>
+                    </button>
+                    <button id="confirmRepo" disabled>Confirm Repo</button>
+                </div>
+                <div class="repo-creation-container">
+                    <div id="createRepoForm" class="create-repo-form">
+                        <div class="form-header">
+                            <p>Organize LeetCode problems with Git</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="newRepoName">Repository name</label>
+                            <input 
+                                type="text" 
+                                id="newRepoName" 
+                                placeholder="Leet-sync-1000" 
+                                class="form-control"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label for="repoVisibility">Visibility</label>
+                            <select id="repoVisibility" class="form-control">
+                                <option value="public">Public</option>
+                                <option value="private">Private</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button id="cancelNewRepo" class="btn btn-cancel">Cancel</button>
+                            <button id="submitNewRepo" class="btn btn-create">Create repo</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -166,7 +157,6 @@
     <script src="icon.js"></script>
     <script src="popup.js"></script>
     <script src="axios.min.js"></script>
-    <script src="popup.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
