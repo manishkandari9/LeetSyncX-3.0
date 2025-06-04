@@ -20,3 +20,17 @@
   - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+
+  ## Overview
+
+LeetSyncX-3.0 is your ultimate companion for effortlessly syncing LeetCode solutions to GitHub, streamlining your coding journey.
+
+### Why LeetSyncX-3.0?
+
+This project serves as a bridge for developers, automating the transfer of coding solutions and enhancing productivity. The core features include:
+
+- 🚀 **Seamless Integration:** Effortlessly sync your LeetCode solutions to GitHub repositories.
+- 🎯 **User-Friendly Interface:** Manage repositories and track your progress with ease.
+- 🏆 **Streak Tracking:** Stay motivated with achievement badges and progress milestones.
+- 💻 **Multi-Language Support:** Handle diverse coding challenges with automatic filename generation.
+- 🔔 **Background Processing:** Enjoy efficient syncing and real-time notifications without interrupting your workflow.
