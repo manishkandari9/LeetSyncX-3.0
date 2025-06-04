@@ -10,6 +10,8 @@ Effortlessly sync your coding journey to GitHub.
 
 ![JSON](https://img.shields.io/badge/JSON-black) ![Markdown](https://img.shields.io/badge/Markdown-black) ![JavaScript](https://img.shields.io/badge/JavaScript-yellow)
 
+</div>
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -18,5 +20,3 @@ Effortlessly sync your coding journey to GitHub.
   - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
-
-</div>
