@@ -1,3 +1,5 @@
+<div align="center">
+
 # LEETSYNCX-3.0
 
 Effortlessly sync your coding journey to GitHub.
@@ -16,3 +18,5 @@ Effortlessly sync your coding journey to GitHub.
   - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+
+</div>
