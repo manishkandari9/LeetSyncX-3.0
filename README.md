@@ -166,8 +166,18 @@ We welcome all kinds of contributions to **LeetSyncX-3.0** — from bug fixes an
 1. **Fork the Repository**  
    👉 [Click here to fork](https://github.com/manishkandari9/LeetSyncX-3.0/fork)
 
-2. **Clone Your Fork**
+2. **Clone Your Fork and Create a Feature Branch**
    ```bash
    git clone https://github.com/manishkandari9/LeetSyncX-3.0.git
    cd LeetSyncX-3.0
+
+   # Create a new feature branch
+   git checkout -b feature/your-feature
+
+   # Make your changes, then stage and commit them
+   git add .
+   git commit -m "✨ Add: your feature title"
+
+   # Push your branch to GitHub
+   git push origin feature/your-feature
 
