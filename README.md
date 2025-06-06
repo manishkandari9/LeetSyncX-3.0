@@ -76,56 +76,82 @@ To manually load LeetSyncX-3.0 as an unpacked Chrome extension:
    git clone https://github.com/manishkandari9/leetsyncx-3.0.git
    Or download the ZIP file and extract it.
 
-Open Chrome Extensions Page:
-Open Chrome and navigate to chrome://extensions/.
-Enable Developer mode (toggle in the top-right corner).
-Load the Extension:
-Click Load unpacked and select the folder containing the LeetSyncX-3.0 files (e.g., leetsyncx-3.0).
-The extension should now appear in your Chrome extensions list.
-Pin the Extension:
-Click the Extensions icon in Chrome and pin LeetSyncX-3.0 for easy access.
-Usage
-Authenticate with GitHub:
-Click the LeetSyncX-3.0 icon in the Chrome toolbar to open the popup.
-Click Login with GitHub and follow the OAuth flow to authenticate.
-This will store a GitHub access token in Chrome's storage.
-Select or Create a Repository:
-After logging in, click Setup Hook to choose an existing GitHub repository or create a new one.
-Select a repository from the list or create a new one by providing a name and visibility (public/private).
-Sync LeetCode Solutions:
-Navigate to a LeetCode problem page (e.g., leetcode.com/problems/two-sum).
-Solve and submit your solution.
-LeetSyncX-3.0 automatically detects the submission and syncs the solution to your selected GitHub repository.
-A spinner appears during syncing, followed by a green checkmark for success or a red cross for failure.
-Track Progress:
-Open the extension popup to view your problem-solving stats (Easy, Medium, Hard) and streak progress.
-Testing
-To test LeetSyncX-3.0:
+# LeetSyncX-3.0
 
-Unit Testing:
-Use a testing framework like Jest to test individual components (e.g., LeetsyncX class methods).
-Example: Test buildFileName() to ensure correct filename formatting.
-Manual Testing:
-Load the extension in Chrome.
-Solve a LeetCode problem and verify that the solution is pushed to the correct GitHub repository.
-Check the popup for updated stats and streak information.
-Edge Cases:
-Test with unsupported languages or failed submissions.
-Verify behavior when GitHub API rate limits are hit.
-Note: Automated tests are not yet included but can be added using Jest or Mocha.
+Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 
-Support the Project
-Love LeetSyncX-3.0? Help keep it running and support future development by buying me a coffee! Your contributions will help cover deployment costs and add new features.
+---
 
+## Installation & Setup
 
-Note: Replace your-username with your actual Buy Me a Coffee username after setting up an account.
+1. **Open Chrome Extensions Page**  
+   Open Chrome and go to:  
+   `chrome://extensions/`  
+   Enable **Developer mode** by toggling the switch at the top-right corner.
 
-Contributing
+2. **Load the Extension**  
+   Click **Load unpacked** and select the folder containing the LeetSyncX-3.0 files (e.g., `leetsyncx-3.0`).  
+   The extension should now appear in your Chrome extensions list.
+
+3. **Pin the Extension**  
+   Click the Extensions icon in Chrome toolbar and pin **LeetSyncX-3.0** for easy access.
+
+---
+
+## Usage
+
+### Authenticate with GitHub  
+- Click the **LeetSyncX-3.0** icon in the Chrome toolbar to open the popup.  
+- Click **Login with GitHub** and follow the OAuth flow to authenticate.  
+- This stores your GitHub access token securely in Chrome's storage.
+
+### Select or Create a Repository  
+- After login, click **Setup Hook** to choose an existing GitHub repository or create a new one.  
+- Select a repository from the list or create a new repository by providing a name and visibility (public/private).
+
+### Sync LeetCode Solutions  
+- Navigate to any LeetCode problem page (e.g., [leetcode.com/problems/two-sum](https://leetcode.com/problems/two-sum)).  
+- Solve and submit your solution.  
+- LeetSyncX-3.0 will automatically detect your submission and sync the solution to the selected GitHub repository.  
+- A spinner indicates syncing; a green checkmark shows success, and a red cross indicates failure.
+
+### Track Your Progress  
+- Open the extension popup to view your problem-solving stats (Easy, Medium, Hard) and streak progress.
+
+---
+
+## Testing
+
+### Unit Testing  
+- Use testing frameworks like Jest to test individual components (e.g., methods of the `LeetSyncX` class).  
+- Example: Test the `buildFileName()` method for correct filename formatting.
+
+### Manual Testing  
+- Load the extension in Chrome.  
+- Solve a LeetCode problem and verify that your solution is pushed to the correct GitHub repo.  
+- Check the popup for updated stats and streak info.
+
+### Edge Cases to Test  
+- Unsupported programming languages or failed submissions.  
+- GitHub API rate limits.
+
+> **Note:** Automated tests are not yet included but can be added using Jest or Mocha.
+
+---
+
+## Support the Project
+
+Love **LeetSyncX-3.0**?  
+Help keep it running and support future development by [buying me a coffee](https://www.buymeacoffee.com/your-username).  
+Your contributions help cover deployment costs and add new features.
+
+---
+
+## Contributing
+
 Contributions are welcome! To contribute:
 
-Fork the repository.
-Create a new branch (git checkout -b feature/your-feature).
-Make your changes and commit (git commit -m "Add your feature").
-Push to your branch (git push origin feature/your-feature).
-Open a Pull Request.
-Please ensure your code follows the existing style and includes tests where applicable.
+1. Fork the repository.  
+2. Create a new branch:  
+   ```bash
+   git checkout -b feature/your-feature
