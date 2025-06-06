@@ -138,12 +138,22 @@ Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 > **Note:** Automated tests are not yet included but can be added using Jest or Mocha.
 
 ---
+## ☕ Support the Project
 
-## Support the Project
+If you ❤️ **LeetSyncX-3.0**, you can fuel its development and keep it thriving by buying me a coffee!
 
-Love **LeetSyncX-3.0**?  
-Help keep it running and support future development by [buying me a coffee](https://www.buymeacoffee.com/your-username).  
-Your contributions help cover deployment costs and add new features.
+<div align="center" style="margin: 20px 0;">
+  <a href="https://www.buymeacoffee.com/your-username" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+    <img 
+      src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+      alt="Buy Me A Coffee" 
+      style="height: 60px; width: 217px; border-radius: 8px;" />
+  </a>
+</div>
+
+Your generous support helps cover hosting costs, add new features, and improve LeetSyncX for everyone.  
+Thank you for being awesome! 🚀
+
 
 ---
 
