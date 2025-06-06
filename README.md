@@ -143,7 +143,7 @@ Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 If you ❤️ **LeetSyncX-3.0**, you can fuel its development and keep it thriving by buying me a coffee!
 
 <div align="center" style="margin: 20px 0;">
-  <a href="https://www.buymeacoffee.com/your-username" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+  <a href="https://coff.ee/manishkandari9" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
     <img 
       src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
       alt="Buy Me A Coffee" 
