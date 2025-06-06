@@ -120,16 +120,23 @@ Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 
 ---
 
-### 🧩 Unit Testing  
-Use **Jest** (or similar) to test discrete components, for example:
+## 🧪 Testing
 
-```javascript
-// Example test for buildFileName()
-test('buildFileName generates correct filename', () => {
-  expect(buildFileName('TwoSum', 'JavaScript')).toBe('TwoSum.js');
-});
+### 🔹 Unit Testing  
+- Use popular frameworks like **Jest** to test individual components and functions.  
+- Example: Test the `buildFileName()` method to ensure correct filename formatting.
 
-```
+### 🔹 Manual Testing  
+- Load the extension in Chrome via `chrome://extensions` → **Load unpacked**.  
+- Solve a LeetCode problem and verify that your solution is pushed correctly to the chosen GitHub repository.  
+- Check the extension popup for updated stats and streak information.
+
+### 🔹 Edge Cases to Test  
+- Unsupported programming languages or failed submissions.  
+- Handling GitHub API rate limits gracefully.
+
+> ⚠️ **Note:** Automated tests are not yet included but can easily be added using frameworks like **Jest** or **Mocha**.
+
 ---
 ## ☕ Support the Project
 
