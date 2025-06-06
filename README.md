@@ -170,14 +170,14 @@ We welcome all kinds of contributions to **LeetSyncX-3.0** — from bug fixes an
    ```bash
    git clone https://github.com/manishkandari9/LeetSyncX-3.0.git
    cd LeetSyncX-3.0
-
+   ```
    # Create a new feature branch
    git checkout -b feature/your-feature
-
+   ```
    # Make your changes, then stage and commit them
    git add .
    git commit -m "✨ Add: your feature title"
-
+```
    # Push your branch to GitHub
    git push origin feature/your-feature
 
