@@ -119,23 +119,19 @@ Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 - Open the extension popup to view your problem-solving stats (Easy, Medium, Hard) and streak progress.
 
 ---
+## 🧪 Testing
 
-## Testing
+---
 
-### Unit Testing  
-- Use testing frameworks like Jest to test individual components (e.g., methods of the `LeetSyncX` class).  
-- Example: Test the `buildFileName()` method for correct filename formatting.
+### 🧩 Unit Testing  
+Use **Jest** (or similar) to test discrete components, for example:
 
-### Manual Testing  
-- Load the extension in Chrome.  
-- Solve a LeetCode problem and verify that your solution is pushed to the correct GitHub repo.  
-- Check the popup for updated stats and streak info.
+```javascript
+// Example test for buildFileName()
+test('buildFileName generates correct filename', () => {
+  expect(buildFileName('TwoSum', 'JavaScript')).toBe('TwoSum.js');
+});
 
-### Edge Cases to Test  
-- Unsupported programming languages or failed submissions.  
-- GitHub API rate limits.
-
-> **Note:** Automated tests are not yet included but can be added using Jest or Mocha.
 
 ---
 ## ☕ Support the Project
