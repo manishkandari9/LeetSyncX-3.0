@@ -119,9 +119,6 @@ Effortlessly sync your LeetCode solutions to GitHub and track your progress.
 - Open the extension popup to view your problem-solving stats (Easy, Medium, Hard) and streak progress.
 
 ---
-## 🧪 Testing
-
----
 
 ### 🧩 Unit Testing  
 Use **Jest** (or similar) to test discrete components, for example:
@@ -132,7 +129,7 @@ test('buildFileName generates correct filename', () => {
   expect(buildFileName('TwoSum', 'JavaScript')).toBe('TwoSum.js');
 });
 
-
+```
 ---
 ## ☕ Support the Project
 
@@ -151,7 +148,7 @@ Your generous support helps cover hosting costs, add new features, and improve L
 Thank you for being awesome! 🚀
 
 
----
+
 
 ## 🤝 Contributing
 
