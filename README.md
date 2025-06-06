@@ -157,11 +157,17 @@ Thank you for being awesome! 🚀
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! To contribute:
+We welcome all kinds of contributions to **LeetSyncX-3.0** — from bug fixes and features to documentation improvements and UI enhancements!
 
-1. Fork the repository.  
-2. Create a new branch:  
+### 🛠️ How to Contribute
+
+1. **Fork the Repository**  
+   👉 [Click here to fork](https://github.com/manishkandari9/LeetSyncX-3.0/fork)
+
+2. **Clone Your Fork**
    ```bash
-   git checkout -b feature/your-feature
+   git clone https://github.com/manishkandari9/LeetSyncX-3.0.git
+   cd LeetSyncX-3.0
+
